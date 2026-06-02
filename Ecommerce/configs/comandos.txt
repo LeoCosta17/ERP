@@ -1,0 +1,16 @@
+Comandos básicos para o golang-migrate:
+
+# 1. Criar um novo par de arquivos de migration (up e down)
+migrate create -ext sql -dir migrations -seq nome_da_migration
+
+# 2. Executar todas as migrations pendentes (Up)
+migrate -path migrations -database "mysql://root:12345@tcp(localhost:3307)/ecommerce" up
+
+# 3. Reverter a última migration executada (Down)
+migrate -path migrations -database "mysql://root:12345@tcp(localhost:3307)/ecommerce" down 1
+
+# 4. Verificar qual a versão atual do esquema no banco de dados
+migrate -path migrations -database "mysql://root:12345@tcp(localhost:3307)/ecommerce" version
+
+# 5. Forçar uma versão específica (útil se o banco ficar em estado "dirty" após um erro)
+migrate -path migrations -database "mysql://root:12345@tcp(localhost:3307)/ecommerce" force <NÚMERO_DA_VERSÃO>
