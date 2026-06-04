@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Nossos CSS Customizados -->
+    <link rel="stylesheet" href="/static/css/components/sidebar.css">
+    <link rel="stylesheet" href="/static/css/app.css">
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão - Dashboard</title>
+</head>
+
+<body>
+    <!-- Container Flex que segura a Sidebar e o Conteúdo lado a lado -->
+    <div class="d-flex" id="wrapper">
+        
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar-wrapper">
+            <div class="sidebar-heading text-center py-4 fs-4 fw-bold text-uppercase border-bottom border-secondary">
+                ERP Gestão
+            </div>
+            <div class="list-group list-group-flush my-3">
+                <a href="#" class="list-group-item list-group-item-action bg-transparent active">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent fw-bold">
+                    <i class="bi bi-people me-2"></i> Usuários
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent fw-bold">
+                    <i class="bi bi-box me-2"></i> Produtos
+                </a>
+                <a href="#" class="list-group-item list-group-item-action bg-transparent text-danger fw-bold mt-5">
+                    <i class="bi bi-box-arrow-left me-2"></i> Sair
+                </a>
+            </div>
+        </div>
+        
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <!-- Navbar de Topo Opcional -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 px-4 shadow-sm border-bottom">
+                <div class="d-flex align-items-center">
+                    <h2 class="fs-4 m-0 text-dark">Dashboard Principal</h2>
+                </div>
+            </nav>
+
+            <!-- Área onde o conteúdo dinâmico vai entrar futuramente -->
+            <div class="container-fluid px-4 py-4 content">
+                
+                <!-- Exemplo de Card de Conteúdo do Bootstrap -->
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4">
+                        <h5 class="card-title text-secondary">Bem-vindo ao Sistema</h5>
+                        <p class="card-text text-muted">Aqui ficará todo o conteúdo das páginas (listas, formulários, gráficos, etc) que faremos futuramente.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+    </script>
+</body>
+
+</html>

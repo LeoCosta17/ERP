@@ -13,7 +13,7 @@ import (
 
 func main() {
 	app := &application{
-		API_port:           fmt.Sprintf(":%d", config.GetInt("API_PORT", 8080)),
+		API_port:           fmt.Sprintf(":%d", config.GetInt("API_ADDR", 8080)),
 		API_maxHeaderBytes: config.GetInt("API_MAX_HEADER_BYTES", 1<<20), // 1 MB
 		API_readTimeout:    config.GetDuration("API_READ_TIMEOUT", 10*time.Second),
 		API_writeTimeout:   config.GetDuration("API_WRITE_TIMEOUT", 10*time.Second),
