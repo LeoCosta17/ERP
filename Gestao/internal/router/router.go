@@ -39,6 +39,8 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 		r.Post("/usuarios", c.Usuarios.CriarUsuario)
 		r.Get("/fornecedores", auth.Autenticar(c.Fornecedores.ListarFornecedores))
 		r.Post("/fornecedores", auth.Autenticar(c.Fornecedores.CriarFornecedor))
+		r.Get("/fornecedores/{id}", auth.Autenticar(c.Fornecedores.ObterFornecedor))
+		r.Put("/fornecedores/{id}", auth.Autenticar(c.Fornecedores.AtualizarFornecedor))
 		r.Get("/categorias", auth.Autenticar(c.Categorias.ListarCategorias))
 		r.Post("/categorias", auth.Autenticar(c.Categorias.CriarCategoria))
 		r.Get("/debitos", auth.Autenticar(c.Debitos.ListarDebitos))

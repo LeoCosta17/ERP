@@ -16,6 +16,8 @@ type Repository struct {
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, tx *sql.Tx, f *model.Fornecedor) (*model.Fornecedor, error)
 		ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error)
+		ObterFornecedorPorID(ctx context.Context, id int64) (*model.Fornecedor, error)
+		AtualizarFornecedor(ctx context.Context, tx *sql.Tx, id int64, f *model.Fornecedor) error
 	}
 	Debitos interface {
 		LancarDebito(ctx context.Context, tx *sql.Tx, debito *model.DebitoAvulsoCriar) error

@@ -22,6 +22,8 @@ type Controller struct {
 	Fornecedores interface {
 		CriarFornecedor(w http.ResponseWriter, r *http.Request)
 		ListarFornecedores(w http.ResponseWriter, r *http.Request)
+		ObterFornecedor(w http.ResponseWriter, r *http.Request)
+		AtualizarFornecedor(w http.ResponseWriter, r *http.Request)
 	}
 	Debitos interface {
 		CriarDebitoAvulso(w http.ResponseWriter, r *http.Request)

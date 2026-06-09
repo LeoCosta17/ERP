@@ -17,6 +17,8 @@ type Service struct {
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, f *model.Fornecedor) (*model.Fornecedor, error)
 		ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error)
+		ObterFornecedorPorID(ctx context.Context, id int64) (*model.Fornecedor, error)
+		AtualizarFornecedor(ctx context.Context, id int64, f *model.Fornecedor) error
 	}
 	Debitos interface {
 		LancarDebito(ctx context.Context, debito *model.DebitoAvulsoCriar) error

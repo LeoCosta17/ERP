@@ -110,3 +110,110 @@ func (r *FornecedorRepository) CriarFornecedor(ctx context.Context, tx *sql.Tx, 
 
 	return f, nil
 }
+
+func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int64) (*model.Fornecedor, error) {
+	queryFornecedor := `
+		SELECT id, razao_social, cnpj, inscricao_estadual, email, created_at, updated_at
+		FROM tb_fornecedores
+		WHERE id = ?
+	`
+	f := &model.Fornecedor{}
+	err := r.db.QueryRowContext(ctx, queryFornecedor, id).Scan(
+		&f.ID, &f.RazaoSocial, &f.CNPJ, &f.InscricaoEstadual, &f.Email, &f.CreatedAt, &f.UpdatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	queryEnderecos := `
+		SELECT id, id_fornecedor, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal, created_at
+		FROM tb_enderecos_fornecedores
+		WHERE id_fornecedor = ?
+	`
+	rowsEnd, err := r.db.QueryContext(ctx, queryEnderecos, id)
+	if err == nil {
+		defer rowsEnd.Close()
+		for rowsEnd.Next() {
+			end := model.EnderecoFornecedor{}
+			err := rowsEnd.Scan(
+				&end.ID, &end.IDFornecedor, &end.CEP, &end.Logradouro, &end.Numero, &end.Bairro, 
+				&end.Municipio, &end.UF, &end.CodigoMunicipio, &end.IsPrincipal, &end.CreatedAt,
+			)
+			if err == nil {
+				f.Enderecos = append(f.Enderecos, end)
+			}
+		}
+	}
+
+	queryTelefones := `
+		SELECT id, id_fornecedor, ddd, numero, created_at
+		FROM tb_telefones_fornecedores
+		WHERE id_fornecedor = ?
+	`
+	rowsTel, err := r.db.QueryContext(ctx, queryTelefones, id)
+	if err == nil {
+		defer rowsTel.Close()
+		for rowsTel.Next() {
+			tel := model.TelefoneFornecedor{}
+			err := rowsTel.Scan(&tel.ID, &tel.IDFornecedor, &tel.DDD, &tel.Numero, &tel.CreatedAt)
+			if err == nil {
+				f.Telefones = append(f.Telefones, tel)
+			}
+		}
+	}
+
+	return f, nil
+}
+
+func (r *FornecedorRepository) AtualizarFornecedor(ctx context.Context, tx *sql.Tx, id int64, f *model.Fornecedor) error {
+	queryFornecedor := `
+		UPDATE tb_fornecedores 
+		SET razao_social = ?, cnpj = ?, inscricao_estadual = ?, email = ?, updated_at = CURRENT_TIMESTAMP
+		WHERE id = ?
+	`
+	_, err := tx.ExecContext(ctx, queryFornecedor, f.RazaoSocial, f.CNPJ, f.InscricaoEstadual, f.Email, id)
+	if err != nil {
+		return err
+	}
+
+	// Deleta endereços e telefones atuais
+	_, err = tx.ExecContext(ctx, "DELETE FROM tb_enderecos_fornecedores WHERE id_fornecedor = ?", id)
+	if err != nil {
+		return err
+	}
+	_, err = tx.ExecContext(ctx, "DELETE FROM tb_telefones_fornecedores WHERE id_fornecedor = ?", id)
+	if err != nil {
+		return err
+	}
+
+	// Insere novos endereços
+	for _, end := range f.Enderecos {
+		queryEndereco := `
+			INSERT INTO tb_enderecos_fornecedores (id_fornecedor, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+		`
+		_, err = tx.ExecContext(ctx, queryEndereco,
+			id, end.CEP, end.Logradouro, end.Numero, end.Bairro, end.Municipio, end.UF, end.CodigoMunicipio, end.IsPrincipal,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Insere novos telefones
+	for _, tel := range f.Telefones {
+		queryTelefone := `
+			INSERT INTO tb_telefones_fornecedores (id_fornecedor, ddd, numero)
+			VALUES (?, ?, ?)
+		`
+		_, err = tx.ExecContext(ctx, queryTelefone, id, tel.DDD, tel.Numero)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

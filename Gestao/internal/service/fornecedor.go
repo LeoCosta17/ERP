@@ -40,3 +40,30 @@ func (s *FornecedorService) CriarFornecedor(ctx context.Context, f *model.Fornec
 
 	return fornecedorCriado, nil
 }
+
+func (s *FornecedorService) ObterFornecedorPorID(ctx context.Context, id int64) (*model.Fornecedor, error) {
+	return s.repository.Fornecedores.ObterFornecedorPorID(ctx, id)
+}
+
+func (s *FornecedorService) AtualizarFornecedor(ctx context.Context, id int64, f *model.Fornecedor) error {
+	if err := f.Validar(); err != nil {
+		return err
+	}
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	err = s.repository.Fornecedores.AtualizarFornecedor(ctx, tx, id, f)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
+}

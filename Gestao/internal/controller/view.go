@@ -77,6 +77,7 @@ func (c *ViewController) RenderizarFornecedoresPage(w http.ResponseWriter, r *ht
 		"web/template/pages/fornecedores.html",
 		"web/template/components/sidebar.html",
 		"web/template/components/modalFornecedor.html",
+		"web/template/components/modalEditarFornecedor.html",
 		"web/template/components/errorModal.html",
 	)
 	if err != nil {
