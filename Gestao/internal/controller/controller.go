@@ -9,6 +9,9 @@ type Controller struct {
 	View interface {
 		RenderizarLoginPage(w http.ResponseWriter, r *http.Request)
 		RenderizarDashboardPage(w http.ResponseWriter, r *http.Request)
+		RenderizarDebitosPage(w http.ResponseWriter, r *http.Request)
+		RenderizarFornecedoresPage(w http.ResponseWriter, r *http.Request)
+		RenderizarCategoriasPage(w http.ResponseWriter, r *http.Request)
 	}
 	Login interface {
 		Login(w http.ResponseWriter, r *http.Request)
@@ -16,12 +19,29 @@ type Controller struct {
 	Usuarios interface {
 		CriarUsuario(w http.ResponseWriter, r *http.Request)
 	}
+	Fornecedores interface {
+		CriarFornecedor(w http.ResponseWriter, r *http.Request)
+		ListarFornecedores(w http.ResponseWriter, r *http.Request)
+	}
+	Debitos interface {
+		CriarDebitoAvulso(w http.ResponseWriter, r *http.Request)
+		ListarDebitos(w http.ResponseWriter, r *http.Request)
+		PagarDebito(w http.ResponseWriter, r *http.Request)
+		EditarDebito(w http.ResponseWriter, r *http.Request)
+	}
+	Categorias interface {
+		CriarCategoria(w http.ResponseWriter, r *http.Request)
+		ListarCategorias(w http.ResponseWriter, r *http.Request)
+	}
 }
 
 func NewController(service *service.Service) *Controller {
 	return &Controller{
-		View:     &ViewController{},
-		Login:    &LoginController{service: service},
-		Usuarios: &UsuarioController{service: service},
+		View:         &ViewController{},
+		Login:        &LoginController{service: service},
+		Usuarios:     &UsuarioController{service: service},
+		Fornecedores: &FornecedorController{service: service},
+		Categorias:   &CategoriaController{service: service},
+		Debitos:      &DebitoController{service: service},
 	}
 }

@@ -13,29 +13,29 @@ type LoginService struct {
 	repository *repository.Repository
 }
 
-func (s *LoginService) Login(ctx context.Context, usuario *model.UsuarioLogin) (uint64, uint64, string, error) {
+func (s *LoginService) Login(ctx context.Context, usuario *model.UsuarioLogin) (uint64, string, error) {
 	if err := usuario.Validar(); err != nil {
-		return 0, 0, "", err
+		return 0, "", err
 	}
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return 0, 0, "", err
+		return 0, "", err
 	}
 	defer tx.Rollback()
 
-	id, id_empresa, nome, senhaDB, err := s.repository.Login.Login(ctx, tx, usuario.Email)
+	id, nome, senhaDB, err := s.repository.Login.Login(ctx, tx, usuario.Email)
 	if err != nil {
-		return 0, 0, "", err
+		return 0, "", err
 	}
 
 	if err := usuario.ValidarSenha(senhaDB); err != nil {
-		return 0, 0, "", errors.New("dados login inválidos")
+		return 0, "", errors.New("dados login inválidos")
 	}
 
 	if err := tx.Commit(); err != nil {
-		return 0, 0, "", err
+		return 0, "", err
 	}
 
-	return id, id_empresa, nome, nil
+	return id, nome, nil
 }

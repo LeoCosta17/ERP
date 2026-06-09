@@ -8,16 +8,38 @@ import (
 
 type Repository struct {
 	Login interface {
-		Login(ctx context.Context, tx *sql.Tx, email string) (uint64, uint64, string, string, error)
+		Login(ctx context.Context, tx *sql.Tx, email string) (uint64, string, string, error)
 	}
 	Usuarios interface {
 		CriarUsuario(ctx context.Context, tx *sql.Tx, usuario *model.UsuarioCriar) (*model.UsuarioBasico, error)
+	}
+	Fornecedores interface {
+		CriarFornecedor(ctx context.Context, tx *sql.Tx, f *model.Fornecedor) (*model.Fornecedor, error)
+		ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error)
+	}
+	Debitos interface {
+		LancarDebito(ctx context.Context, tx *sql.Tx, debito *model.DebitoAvulsoCriar) error
+		ListarDebitos(ctx context.Context, busca, vencimento, status string) ([]*model.Debito, error)
+		PagarDebito(ctx context.Context, tx *sql.Tx, id int64) error
+		EditarDebito(ctx context.Context, tx *sql.Tx, id int64, debito *model.DebitoAvulsoCriar) error
+	}
+	Categorias interface {
+		CriarCategoria(ctx context.Context, tx *sql.Tx, c *model.CategoriaDebito) (*model.CategoriaDebito, error)
+		ListarCategorias(ctx context.Context) ([]*model.CategoriaDebito, error)
 	}
 }
 
 func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
+		Login: &LoginRepository{
+			db: db,
+		},
 		Usuarios: &UsuarioRepository{
+			db: db,
+		},
+		Fornecedores: NovoFornecedorRepository(db),
+		Categorias:   NovoCategoriaRepository(db),
+		Debitos: &DebitoRepository{
 			db: db,
 		},
 	}

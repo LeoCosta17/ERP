@@ -22,13 +22,13 @@ func (c *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, id_empresa, nome, err := c.service.Login.Login(r.Context(), &usuarioRequest)
+	id, nome, err := c.service.Login.Login(r.Context(), &usuarioRequest)
 	if err != nil {
 		resposta.Padrao(w, http.StatusUnauthorized, "dados login inválidos")
 		return
 	}
 
-	tokenString, err := token.GerarTokenJWT(int(id_empresa), int(id), nome)
+	tokenString, err := token.GerarTokenJWT(int(id), nome)
 	if err != nil {
 		resposta.Padrao(w, http.StatusInternalServerError, "erro ao gerar token")
 		return

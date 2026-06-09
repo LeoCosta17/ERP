@@ -14,6 +14,7 @@ func (c *ViewController) RenderizarLoginPage(w http.ResponseWriter, r *http.Requ
 	tmpl, err := template.ParseFiles(
 		"web/template/pages/login.html",
 		"web/template/components/loginForm.html",
+		"web/template/components/errorModal.html",
 	)
 
 	if err != nil {
@@ -30,7 +31,10 @@ func (c *ViewController) RenderizarLoginPage(w http.ResponseWriter, r *http.Requ
 }
 
 func (c *ViewController) RenderizarDashboardPage(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("web/template/pages/dashboard.html")
+	tmpl, err := template.ParseFiles(
+		"web/template/pages/dashboard.html",
+		"web/template/components/sidebar.html",
+	)
 	if err != nil {
 		fmt.Printf("Erro ao renderizar dashboard: %v\n", err)
 		http.Error(w, "Erro ao renderizar dashboard", http.StatusInternalServerError)
@@ -40,6 +44,66 @@ func (c *ViewController) RenderizarDashboardPage(w http.ResponseWriter, r *http.
 	if err := tmpl.Execute(w, nil); err != nil {
 		fmt.Printf("Erro ao renderizar dashboard: %v\n", err)
 		http.Error(w, "Erro ao renderizar dashboard", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (c *ViewController) RenderizarDebitosPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(
+		"web/template/pages/debitos.html",
+		"web/template/components/sidebar.html",
+		"web/template/components/modalDebitoAvulso.html",
+		"web/template/components/modalEditarDebito.html",
+	)
+	if err != nil {
+		fmt.Printf("Erro ao renderizar página de débitos: %v\n", err)
+		http.Error(w, "Erro interno ao renderizar página", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, nil); err != nil {
+		fmt.Printf("Erro ao executar template de débitos: %v\n", err)
+		http.Error(w, "Erro interno", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (c *ViewController) RenderizarFornecedoresPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(
+		"web/template/pages/fornecedores.html",
+		"web/template/components/sidebar.html",
+		"web/template/components/modalFornecedor.html",
+		"web/template/components/errorModal.html",
+	)
+	if err != nil {
+		fmt.Printf("Erro ao renderizar página de fornecedores: %v\n", err)
+		http.Error(w, "Erro interno ao renderizar página", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, nil); err != nil {
+		fmt.Printf("Erro ao executar template de fornecedores: %v\n", err)
+		http.Error(w, "Erro interno", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (c *ViewController) RenderizarCategoriasPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(
+		"web/template/pages/categorias_debito.html",
+		"web/template/components/sidebar.html",
+		"web/template/components/modalCategoria.html",
+		"web/template/components/errorModal.html",
+	)
+	if err != nil {
+		fmt.Printf("Erro ao renderizar página de categorias: %v\n", err)
+		http.Error(w, "Erro interno ao renderizar página", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, nil); err != nil {
+		fmt.Printf("Erro ao executar template de categorias: %v\n", err)
+		http.Error(w, "Erro interno", http.StatusInternalServerError)
 		return
 	}
 }

@@ -9,10 +9,9 @@ import (
 )
 
 // GerarTokenJWT é uma função que gera um token JWT para um usuário autenticado, usando o ID e nome do usuário como payload
-func GerarTokenJWT(empresaID, usuarioID int, nome string) (string, error) {
+func GerarTokenJWT(usuarioID int, nome string) (string, error) {
 	var secretKey = config.GetToken("JWT_KEY")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"empresa_id": empresaID,
 		"usuario_id": usuarioID,
 		"nome":       nome,
 		"exp":        time.Now().Add(time.Minute * 20).Unix(),
