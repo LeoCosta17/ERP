@@ -28,6 +28,7 @@ type Service struct {
 		CriarCategoria(ctx context.Context, c *model.CategoriaDebito) (*model.CategoriaDebito, error)
 		ListarCategorias(ctx context.Context) ([]*model.CategoriaDebito, error)
 	}
+	Dashboard *DashboardService
 }
 
 func NewService(repository *repository.Repository, db *sql.DB) *Service {
@@ -52,5 +53,6 @@ func NewService(repository *repository.Repository, db *sql.DB) *Service {
 			repository: repository,
 			db:         db,
 		},
+		Dashboard: NewDashboardService(repository.Dashboard),
 	}
 }

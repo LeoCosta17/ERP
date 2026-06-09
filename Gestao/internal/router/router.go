@@ -45,6 +45,7 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 		r.Post("/debitos", auth.Autenticar(c.Debitos.CriarDebitoAvulso))
 		r.Put("/debitos/{id}", auth.Autenticar(c.Debitos.EditarDebito))
 		r.Put("/debitos/{id}/pagar", auth.Autenticar(c.Debitos.PagarDebito))
+		r.Get("/dashboard/resumo", auth.Autenticar(c.Dashboard.ResumoDashboard))
 	})
 
 	return r

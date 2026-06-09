@@ -21,8 +21,6 @@ func (c *DebitoController) CriarDebitoAvulso(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-
-
 	if err := c.service.Debitos.LancarDebito(r.Context(), &debito); err != nil {
 		resposta.Padrao(w, http.StatusInternalServerError, map[string]string{"erro": "Erro ao processar débito: " + err.Error()})
 		return

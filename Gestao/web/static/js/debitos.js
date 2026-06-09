@@ -14,13 +14,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabelaDebitos = document.getElementById('tabela_debitos_body');
 
     // Carregar dropdowns e débitos da tabela
-    carregarDropdowns();
-    carregarDebitos();
+    if (formDebito) {
+        carregarDropdowns();
+    }
 
-    formFiltro.addEventListener('submit', (e) => {
-        e.preventDefault();
+    if (tabelaDebitos) {
         carregarDebitos();
-    });
+    }
+
+    if (formFiltro) {
+        formFiltro.addEventListener('submit', (e) => {
+            e.preventDefault();
+            carregarDebitos();
+        });
+    }
 
     async function carregarDropdowns() {
         try {
@@ -131,7 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modal) modal.hide();
 
             formDebito.reset();
-            carregarDebitos();
+            if (tabelaDebitos) {
+                carregarDebitos();
+            } else {
+                // Se estamos no dashboard, recarrega o dashboard
+                window.location.reload();
+            }
         } catch (err) {
             console.error(err);
             alert("Erro interno ao comunicar com o servidor.");
@@ -139,8 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function carregarDebitos() {
+        if (!tabelaDebitos) return;
         tabelaDebitos.innerHTML = '<tr><td colspan="7" class="text-muted py-5 text-center">Carregando...</td></tr>';
-        
+
         const busca = document.getElementById('filtro_fornecedor').value;
         const vencimento = document.getElementById('filtro_vencimento').value;
         const status = document.getElementById('filtro_status').value;
@@ -186,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
         debitos.forEach(d => {
             const dataVencimento = d.dt_vencimento ? d.dt_vencimento.substring(0, 10).split('-').reverse().join('/') : '-';
             const valorFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(d.valor);
-            
+
             let badgeClass = 'bg-secondary';
             if (d.status === 'PENDENTE') badgeClass = 'bg-warning text-dark';
             if (d.status === 'PAGO') badgeClass = 'bg-success';
@@ -201,8 +214,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="fw-bold text-danger">${valorFormatado}</td>
                 <td><span class="badge ${badgeClass} px-3 py-2 rounded-pill">${d.status}</span></td>
                 <td>
-                    <button class="btn btn-sm btn-outline-primary" title="Visualizar"><i class="bi bi-eye"></i></button>
-                    <button class="btn btn-sm btn-outline-warning" title="Editar" onclick="abrirModalEdicao(${d.id})"><i class="bi bi-pencil"></i></button>
+                    <button class="btn btn-sm btn-outline-primary" title="Visualizar" onclick="abrirModalVisualizacao(${d.id})"><i class="bi bi-eye"></i></button>
+                    <button class="btn btn-sm btn-outline-warning" title="Editar" onclick="abrirModalEdicao(${d.id})" ${d.status === 'PAGO' ? 'disabled' : ''}><i class="bi bi-pencil"></i></button>
                     ${d.status === 'PENDENTE' ? `<button class="btn btn-sm btn-outline-success" title="Dar Baixa" onclick="pagarDebito(${d.id})"><i class="bi bi-check2-circle"></i></button>` : ''}
                 </td>
             `;
@@ -211,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Funcionalidades de Pagamento e Edição
-    window.pagarDebito = async function(id) {
+    window.pagarDebito = async function (id) {
         if (!confirm("Tem certeza que deseja dar baixa (pagar) este débito?")) return;
 
         try {
@@ -234,7 +247,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    window.abrirModalEdicao = function(id) {
+    window.abrirModalVisualizacao = function (id) {
+        const debito = debitosCarregados.find(d => d.id === id);
+        if (!debito) return;
+
+        document.getElementById('view_fornecedor').textContent = debito.fornecedor ? debito.fornecedor.razao_social : '-';
+        document.getElementById('view_categoria').textContent = debito.categoria ? debito.categoria.nome : 'Sem Categoria';
+        document.getElementById('view_descricao').textContent = debito.descricao;
+        document.getElementById('view_nr_documento').textContent = debito.nr_documento || '-';
+        document.getElementById('view_nr_nota_fiscal').textContent = debito.nr_nota_fiscal || '-';
+        document.getElementById('view_valor').textContent = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(debito.valor);
+        document.getElementById('view_dt_entrada').textContent = debito.dt_entrada ? debito.dt_entrada.substring(0, 10).split('-').reverse().join('/') : '-';
+        document.getElementById('view_dt_vencimento').textContent = debito.dt_vencimento ? debito.dt_vencimento.substring(0, 10).split('-').reverse().join('/') : '-';
+        document.getElementById('view_parcela').textContent = `${debito.nr_parcela} / ${debito.nr_total_parcelas}`;
+        document.getElementById('view_status').textContent = debito.status;
+
+        const modalEl = document.getElementById('modalVisualizarDebito');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    };
+
+    window.abrirModalEdicao = function (id) {
         const debito = debitosCarregados.find(d => d.id === id);
         if (!debito) return;
 

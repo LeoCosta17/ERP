@@ -27,6 +27,7 @@ type Repository struct {
 		CriarCategoria(ctx context.Context, tx *sql.Tx, c *model.CategoriaDebito) (*model.CategoriaDebito, error)
 		ListarCategorias(ctx context.Context) ([]*model.CategoriaDebito, error)
 	}
+	Dashboard *DashboardRepository
 }
 
 func NewRepository(db *sql.DB) *Repository {
@@ -42,5 +43,6 @@ func NewRepository(db *sql.DB) *Repository {
 		Debitos: &DebitoRepository{
 			db: db,
 		},
+		Dashboard: NewDashboardRepository(db),
 	}
 }

@@ -11,53 +11,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const formNovo = document.getElementById('formNovoFornecedor');
     
     // Carregar fornecedores iniciais
-    carregarFornecedores();
+    if (tbody) {
+        carregarFornecedores();
+    }
 
     // Filtro
-    formFiltro.addEventListener('submit', (e) => {
-        e.preventDefault();
-        carregarFornecedores(inputBusca.value);
-    });
+    if (formFiltro) {
+        formFiltro.addEventListener('submit', (e) => {
+            e.preventDefault();
+            carregarFornecedores(inputBusca.value);
+        });
+    }
 
     // Criação de Fornecedor
-    formNovo.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    if (formNovo) {
+        formNovo.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        const razao_social = document.getElementById('fornecedor_razao_social').value;
-        const cnpj = document.getElementById('fornecedor_cnpj').value;
-        const email = document.getElementById('fornecedor_email').value;
+            const razao_social = document.getElementById('fornecedor_razao_social').value;
+            const cnpj = document.getElementById('fornecedor_cnpj').value;
+            const email = document.getElementById('fornecedor_email').value;
 
-        try {
-            const res = await fetch('/api/fornecedores', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ razao_social, cnpj, email })
-            });
+            try {
+                const res = await fetch('/api/fornecedores', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ razao_social, cnpj, email })
+                });
 
-            if (!res.ok) {
-                const data = await res.json();
-                showError(data.erro || "Erro ao cadastrar fornecedor.");
-                return;
+                if (!res.ok) {
+                    const data = await res.json();
+                    showError(data.erro || "Erro ao cadastrar fornecedor.");
+                    return;
+                }
+
+                // Sucesso
+                const modalEl = document.getElementById('modalFornecedor');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                formNovo.reset();
+                if (tbody) {
+                    carregarFornecedores(); // recarrega a lista
+                } else {
+                    window.location.reload();
+                }
+
+            } catch (err) {
+                console.error(err);
+                showError("Erro interno ao comunicar com o servidor.");
             }
-
-            // Sucesso
-            const modalEl = document.getElementById('modalFornecedor');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-            formNovo.reset();
-            carregarFornecedores(); // recarrega a lista
-
-        } catch (err) {
-            console.error(err);
-            showError("Erro interno ao comunicar com o servidor.");
-        }
-    });
+        });
+    }
 
     async function carregarFornecedores(busca = "") {
+        if (!tbody) return;
         tbody.innerHTML = `<tr><td colspan="5" class="text-muted py-5 text-center">Carregando...</td></tr>`;
         
         try {

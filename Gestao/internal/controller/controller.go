@@ -33,6 +33,9 @@ type Controller struct {
 		CriarCategoria(w http.ResponseWriter, r *http.Request)
 		ListarCategorias(w http.ResponseWriter, r *http.Request)
 	}
+	Dashboard interface {
+		ResumoDashboard(w http.ResponseWriter, r *http.Request)
+	}
 }
 
 func NewController(service *service.Service) *Controller {
@@ -43,5 +46,6 @@ func NewController(service *service.Service) *Controller {
 		Fornecedores: &FornecedorController{service: service},
 		Categorias:   &CategoriaController{service: service},
 		Debitos:      &DebitoController{service: service},
+		Dashboard:    &DashboardController{service: service.Dashboard},
 	}
 }

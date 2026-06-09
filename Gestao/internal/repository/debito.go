@@ -42,9 +42,11 @@ func (r *DebitoRepository) ListarDebitos(ctx context.Context, busca, vencimento,
 	query := `
 		SELECT d.id, d.id_fornecedor, d.id_categoria, d.descricao, d.nr_documento, d.nr_nota_fiscal, 
 		       d.valor, d.dt_entrada, d.dt_vencimento, d.nr_parcela, d.nr_total_parcelas, d.status, d.created_at, d.updated_at,
-		       f.id, f.razao_social, f.cnpj
+		       f.id, f.razao_social, f.cnpj,
+		       c.id, c.nome
 		FROM tb_debitos d
 		JOIN tb_fornecedores f ON d.id_fornecedor = f.id
+		LEFT JOIN tb_categorias_debito c ON d.id_categoria = c.id
 		WHERE 1=1
 	`
 	var args []interface{}
@@ -79,17 +81,27 @@ func (r *DebitoRepository) ListarDebitos(ctx context.Context, busca, vencimento,
 	for rows.Next() {
 		d := &model.Debito{}
 		f := &model.Fornecedor{}
+		
+		var cId sql.NullInt64
+		var cNome sql.NullString
 
 		err := rows.Scan(
 			&d.ID, &d.IDFornecedor, &d.IDCategoria, &d.Descricao, &d.NrDocumento, &d.NrNotaFiscal,
 			&d.Valor, &d.DtEntrada, &d.DtVencimento, &d.NrParcela, &d.NrTotalParcelas, &d.Status, &d.CreatedAt, &d.UpdatedAt,
 			&f.ID, &f.RazaoSocial, &f.CNPJ,
+			&cId, &cNome,
 		)
 		if err != nil {
 			return nil, err
 		}
 
 		d.Fornecedor = f
+		if cId.Valid {
+			d.Categoria = &model.CategoriaDebito{
+				ID:   cId.Int64,
+				Nome: cNome.String,
+			}
+		}
 		debitos = append(debitos, d)
 	}
 

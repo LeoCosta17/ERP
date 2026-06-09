@@ -34,6 +34,9 @@ func (c *ViewController) RenderizarDashboardPage(w http.ResponseWriter, r *http.
 	tmpl, err := template.ParseFiles(
 		"web/template/pages/dashboard.html",
 		"web/template/components/sidebar.html",
+		"web/template/components/modalDebitoAvulso.html",
+		"web/template/components/modalFornecedor.html",
+		"web/template/components/errorModal.html",
 	)
 	if err != nil {
 		fmt.Printf("Erro ao renderizar dashboard: %v\n", err)
@@ -54,6 +57,7 @@ func (c *ViewController) RenderizarDebitosPage(w http.ResponseWriter, r *http.Re
 		"web/template/components/sidebar.html",
 		"web/template/components/modalDebitoAvulso.html",
 		"web/template/components/modalEditarDebito.html",
+		"web/template/components/modalVisualizarDebito.html",
 	)
 	if err != nil {
 		fmt.Printf("Erro ao renderizar página de débitos: %v\n", err)
