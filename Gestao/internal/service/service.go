@@ -14,6 +14,9 @@ type Service struct {
 	Login interface {
 		Login(ctx context.Context, usuario *model.UsuarioLogin) (uint64, string, error)
 	}
+	Clientes interface {
+		CriarCliente(ctx context.Context, c *model.Cliente) (*model.Cliente, error)
+	}
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, f *model.Fornecedor) (*model.Fornecedor, error)
 		ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error)
@@ -40,6 +43,10 @@ func NewService(repository *repository.Repository, db *sql.DB) *Service {
 			db:         db,
 		},
 		Login: &LoginService{
+			repository: repository,
+			db:         db,
+		},
+		Clientes: &ClienteService{
 			repository: repository,
 			db:         db,
 		},

@@ -1,5 +1,7 @@
 package model
 
+import "errors"
+
 type TipoPessoa string
 type IndContribuinte int
 
@@ -40,4 +42,29 @@ type EnderecoCliente struct {
 	CodigoMunicipio string `json:"codigo_municipio" db:"codigo_municipio"`
 	IsPrincipal     bool   `json:"is_principal" db:"is_principal"`
 	CreatedAt       string `json:"created_at" db:"created_at"`
+}
+
+func (c *Cliente) Validar() error {
+	var erros []error
+
+	if c.Nome == "" {
+		erros = append(erros, errors.New("nome do cliente obrigatório"))
+	}
+	if c.Tipo == "" {
+		erros = append(erros, errors.New("tipo do cliente obrigatório"))
+	}
+	if c.Tipo == PessoaFisica && c.CPF == "" {
+		erros = append(erros, errors.New("CPF obrigatório"))
+	}
+	if c.Tipo == PessoaJuridica && c.CNPJ == "" {
+		erros = append(erros, errors.New("CNPJ obrigatório"))
+	}
+	if c.Telefone == "" {
+		erros = append(erros, errors.New("telefone obrigatório"))
+	}
+	if len(erros) != 0 {
+		return errors.Join(erros...)
+	}
+
+	return nil
 }
