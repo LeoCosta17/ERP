@@ -10,13 +10,6 @@ type FornecedorRepository struct {
 	db *sql.DB
 }
 
-// NovoFornecedorRepository cria uma nova instância do repositório
-func NovoFornecedorRepository(db *sql.DB) *FornecedorRepository {
-	return &FornecedorRepository{
-		db: db,
-	}
-}
-
 func (r *FornecedorRepository) ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error) {
 	query := `
 		SELECT id, razao_social, cnpj, inscricao_estadual, email, created_at, updated_at
@@ -78,11 +71,11 @@ func (r *FornecedorRepository) CriarFornecedor(ctx context.Context, tx *sql.Tx, 
 		err = tx.QueryRowContext(ctx, queryEndereco,
 			f.ID, end.CEP, end.Logradouro, end.Numero, end.Bairro, end.Municipio, end.UF, end.CodigoMunicipio, end.IsPrincipal,
 		).Scan(&endID, &end.CreatedAt)
-		
+
 		if err != nil {
 			return nil, err
 		}
-		
+
 		// Atualiza os dados do item no slice
 		f.Enderecos[i].ID = endID
 		f.Enderecos[i].IDFornecedor = f.ID
@@ -101,7 +94,7 @@ func (r *FornecedorRepository) CriarFornecedor(ctx context.Context, tx *sql.Tx, 
 		if err != nil {
 			return nil, err
 		}
-		
+
 		// Atualiza os dados do item no slice
 		f.Telefones[i].ID = telID
 		f.Telefones[i].IDFornecedor = f.ID
@@ -139,7 +132,7 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int6
 		for rowsEnd.Next() {
 			end := model.EnderecoFornecedor{}
 			err := rowsEnd.Scan(
-				&end.ID, &end.IDFornecedor, &end.CEP, &end.Logradouro, &end.Numero, &end.Bairro, 
+				&end.ID, &end.IDFornecedor, &end.CEP, &end.Logradouro, &end.Numero, &end.Bairro,
 				&end.Municipio, &end.UF, &end.CodigoMunicipio, &end.IsPrincipal, &end.CreatedAt,
 			)
 			if err == nil {

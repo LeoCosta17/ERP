@@ -23,7 +23,9 @@ type Cliente struct {
 	Contribuinte      IndContribuinte   `json:"contribuinte,omitempty"`
 	IsConsumidorFinal bool              `json:"is_consumidor_final,omitempty"`
 	IE                string            `json:"ie,omitempty"`
-	Endereco          []EnderecoCliente `json:"endereco"`
+	Enderecos         []EnderecoCliente `json:"endereco"`
+	CreatedAt         string            `json:"created_at,omitempty"`
+	UpdatedAt         string            `json:"updated_at,omitempty"`
 }
 
 type EnderecoCliente struct {

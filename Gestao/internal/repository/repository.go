@@ -13,6 +13,9 @@ type Repository struct {
 	Usuarios interface {
 		CriarUsuario(ctx context.Context, tx *sql.Tx, usuario *model.UsuarioCriar) (*model.UsuarioBasico, error)
 	}
+	Clientes interface {
+		CriarCliente(ctx context.Context, tx *sql.Tx, c *model.Cliente) (*model.Cliente, error)
+	}
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, tx *sql.Tx, f *model.Fornecedor) (*model.Fornecedor, error)
 		ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error)
@@ -40,8 +43,13 @@ func NewRepository(db *sql.DB) *Repository {
 		Usuarios: &UsuarioRepository{
 			db: db,
 		},
-		Fornecedores: NovoFornecedorRepository(db),
-		Categorias:   NovoCategoriaRepository(db),
+		Fornecedores: &FornecedorRepository{
+			db: db,
+		},
+		Clientes: &ClienteRepository{
+			db: db,
+		},
+		Categorias: NovoCategoriaRepository(db),
 		Debitos: &DebitoRepository{
 			db: db,
 		},
