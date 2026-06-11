@@ -19,7 +19,7 @@ func (r *FornecedorRepository) ListarFornecedores(ctx context.Context, busca str
 	var err error
 
 	if busca != "" {
-		query += " WHERE razao_social LIKE ? OR cnpj LIKE ?"
+		query += " WHERE razao_social LIKE $1 OR cnpj LIKE $2"
 		buscaParam := "%" + busca + "%"
 		rows, err = r.db.QueryContext(ctx, query, buscaParam, buscaParam)
 	} else {
@@ -51,7 +51,7 @@ func (r *FornecedorRepository) CriarFornecedor(ctx context.Context, tx *sql.Tx, 
 	// 1. Inserir Fornecedor
 	queryFornecedor := `
 		INSERT INTO tb_fornecedores (razao_social, cnpj, inscricao_estadual, email)
-		VALUES (?, ?, ?, ?)
+		VALUES ($1, $2, $3, $4)
 		RETURNING id, created_at, updated_at;
 	`
 	err := tx.QueryRowContext(ctx, queryFornecedor, f.RazaoSocial, f.CNPJ, f.InscricaoEstadual, f.Email).Scan(&id, &f.CreatedAt, &f.UpdatedAt)
@@ -65,7 +65,7 @@ func (r *FornecedorRepository) CriarFornecedor(ctx context.Context, tx *sql.Tx, 
 		var endID int64
 		queryEndereco := `
 			INSERT INTO tb_enderecos_fornecedores (id_fornecedor, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			RETURNING id, created_at;
 		`
 		err = tx.QueryRowContext(ctx, queryEndereco,
@@ -87,7 +87,7 @@ func (r *FornecedorRepository) CriarFornecedor(ctx context.Context, tx *sql.Tx, 
 		var telID int64
 		queryTelefone := `
 			INSERT INTO tb_telefones_fornecedores (id_fornecedor, ddd, numero)
-			VALUES (?, ?, ?)
+			VALUES ($1, $2, $3)
 			RETURNING id, created_at;
 		`
 		err = tx.QueryRowContext(ctx, queryTelefone, f.ID, tel.DDD, tel.Numero).Scan(&telID, &tel.CreatedAt)
@@ -108,7 +108,7 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int6
 	queryFornecedor := `
 		SELECT id, razao_social, cnpj, inscricao_estadual, email, created_at, updated_at
 		FROM tb_fornecedores
-		WHERE id = ?
+		WHERE id = $1
 	`
 	f := &model.Fornecedor{}
 	err := r.db.QueryRowContext(ctx, queryFornecedor, id).Scan(
@@ -124,7 +124,7 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int6
 	queryEnderecos := `
 		SELECT id, id_fornecedor, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal, created_at
 		FROM tb_enderecos_fornecedores
-		WHERE id_fornecedor = ?
+		WHERE id_fornecedor = $1
 	`
 	rowsEnd, err := r.db.QueryContext(ctx, queryEnderecos, id)
 	if err == nil {
@@ -144,7 +144,7 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int6
 	queryTelefones := `
 		SELECT id, id_fornecedor, ddd, numero, created_at
 		FROM tb_telefones_fornecedores
-		WHERE id_fornecedor = ?
+		WHERE id_fornecedor = $1
 	`
 	rowsTel, err := r.db.QueryContext(ctx, queryTelefones, id)
 	if err == nil {
@@ -164,8 +164,8 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int6
 func (r *FornecedorRepository) AtualizarFornecedor(ctx context.Context, tx *sql.Tx, id int64, f *model.Fornecedor) error {
 	queryFornecedor := `
 		UPDATE tb_fornecedores 
-		SET razao_social = ?, cnpj = ?, inscricao_estadual = ?, email = ?, updated_at = CURRENT_TIMESTAMP
-		WHERE id = ?
+		SET razao_social = $1, cnpj = $2, inscricao_estadual = $3, email = $4, updated_at = CURRENT_TIMESTAMP
+		WHERE id = $5
 	`
 	_, err := tx.ExecContext(ctx, queryFornecedor, f.RazaoSocial, f.CNPJ, f.InscricaoEstadual, f.Email, id)
 	if err != nil {
@@ -173,11 +173,11 @@ func (r *FornecedorRepository) AtualizarFornecedor(ctx context.Context, tx *sql.
 	}
 
 	// Deleta endereços e telefones atuais
-	_, err = tx.ExecContext(ctx, "DELETE FROM tb_enderecos_fornecedores WHERE id_fornecedor = ?", id)
+	_, err = tx.ExecContext(ctx, "DELETE FROM tb_enderecos_fornecedores WHERE id_fornecedor = $1", id)
 	if err != nil {
 		return err
 	}
-	_, err = tx.ExecContext(ctx, "DELETE FROM tb_telefones_fornecedores WHERE id_fornecedor = ?", id)
+	_, err = tx.ExecContext(ctx, "DELETE FROM tb_telefones_fornecedores WHERE id_fornecedor = $1", id)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func (r *FornecedorRepository) AtualizarFornecedor(ctx context.Context, tx *sql.
 	for _, end := range f.Enderecos {
 		queryEndereco := `
 			INSERT INTO tb_enderecos_fornecedores (id_fornecedor, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		`
 		_, err = tx.ExecContext(ctx, queryEndereco,
 			id, end.CEP, end.Logradouro, end.Numero, end.Bairro, end.Municipio, end.UF, end.CodigoMunicipio, end.IsPrincipal,
@@ -200,7 +200,7 @@ func (r *FornecedorRepository) AtualizarFornecedor(ctx context.Context, tx *sql.
 	for _, tel := range f.Telefones {
 		queryTelefone := `
 			INSERT INTO tb_telefones_fornecedores (id_fornecedor, ddd, numero)
-			VALUES (?, ?, ?)
+			VALUES ($1, $2, $3)
 		`
 		_, err = tx.ExecContext(ctx, queryTelefone, id, tel.DDD, tel.Numero)
 		if err != nil {

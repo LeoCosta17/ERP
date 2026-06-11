@@ -32,8 +32,8 @@ func (r *DashboardRepository) GetTotalDebitosSemana(ctx context.Context, inicioS
 		SELECT COALESCE(SUM(valor), 0) 
 		FROM tb_debitos 
 		WHERE status = 'PENDENTE' 
-		  AND dt_vencimento >= ? 
-		  AND dt_vencimento <= ?
+		  AND dt_vencimento >= $1 
+		  AND dt_vencimento <= $2
 	`
 	var total float64
 	err := r.db.QueryRowContext(ctx, query, inicioSemana.Format("2006-01-02"), fimSemana.Format("2006-01-02")).Scan(&total)
@@ -53,7 +53,7 @@ func (r *DashboardRepository) GetDespesasPorCategoria(ctx context.Context, inici
 			SUM(d.valor) as total
 		FROM tb_debitos d
 		LEFT JOIN tb_categorias_debito c ON d.id_categoria = c.id
-		WHERE d.dt_vencimento >= ? AND d.dt_vencimento <= ?
+		WHERE d.dt_vencimento >= $1 AND d.dt_vencimento <= $2
 		GROUP BY c.nome
 		ORDER BY total DESC
 		LIMIT 5

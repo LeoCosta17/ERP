@@ -30,6 +30,7 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 	r.Get("/", c.View.RenderizarLoginPage)
 	r.Get("/dashboard", c.View.RenderizarDashboardPage)
 	r.Get("/debitos", c.View.RenderizarDebitosPage)
+	r.Get("/clientes", c.View.RenderizarClientesPage)
 	r.Get("/fornecedores", c.View.RenderizarFornecedoresPage)
 	r.Get("/categorias-debito", c.View.RenderizarCategoriasPage)
 

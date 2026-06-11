@@ -15,7 +15,7 @@ func (r *LoginRepository) Login(ctx context.Context, tx *sql.Tx, email string) (
 	var id uint64
 	err := tx.QueryRowContext(ctx, `
 		select id, nome, senha from tb_usuarios_gestao
-		where email = ?;
+		where email = $1;
 	`, email).Scan(&id, &nome, &senhaDB)
 
 	if err != nil {

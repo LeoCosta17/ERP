@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS tb_enderecos_fornecedores (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     id_fornecedor BIGINT NOT NULL,
     cep VARCHAR(8) NOT NULL,
     logradouro VARCHAR(255) NOT NULL,
@@ -11,4 +11,4 @@ CREATE TABLE IF NOT EXISTS tb_enderecos_fornecedores (
     is_principal BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_endereco_fornecedor FOREIGN KEY (id_fornecedor) REFERENCES tb_fornecedores(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);

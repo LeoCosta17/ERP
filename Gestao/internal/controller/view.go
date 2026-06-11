@@ -72,6 +72,26 @@ func (c *ViewController) RenderizarDebitosPage(w http.ResponseWriter, r *http.Re
 	}
 }
 
+func (c *ViewController) RenderizarClientesPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(
+		"web/template/pages/clientes.html",
+		"web/template/components/sidebar.html",
+		"web/template/components/modalCliente.html",
+		"web/template/components/errorModal.html",
+	)
+	if err != nil {
+		fmt.Printf("Erro ao renderizar página de clientes: %v\n", err)
+		http.Error(w, "Erro interno ao renderizar página", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, nil); err != nil {
+		fmt.Printf("Erro ao executar template de clientes: %v\n", err)
+		http.Error(w, "Erro interno", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (c *ViewController) RenderizarFornecedoresPage(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(
 		"web/template/pages/fornecedores.html",

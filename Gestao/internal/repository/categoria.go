@@ -15,7 +15,7 @@ func NovoCategoriaRepository(db *sql.DB) *CategoriaRepository {
 }
 
 func (r *CategoriaRepository) CriarCategoria(ctx context.Context, tx *sql.Tx, c *model.CategoriaDebito) (*model.CategoriaDebito, error) {
-	query := `INSERT INTO tb_categorias_debito (nome) VALUES (?) RETURNING id;`
+	query := `INSERT INTO tb_categorias_debito (nome) VALUES ($1) RETURNING id;`
 	
 	err := tx.QueryRowContext(ctx, query, c.Nome).Scan(&c.ID)
 	if err != nil {

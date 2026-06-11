@@ -20,22 +20,28 @@ func main() {
 	}
 
 	database := &db.BancoDados{
-		ConnectionString: config.GetString("DB_CONNECTION_STRING", "admin:12345@tcp(localhost:3307)/ecommerce"),
-		Driver:           config.GetString("DB_DRIVER", "mysql"),
+		ConnectionString: config.GetString("DB_CONNECTION_STRING", "user=admin password=12345 dbname=ecommerce host=localhost port=5432 sslmode=disable"),
+		Driver:           config.GetString("DB_DRIVER", "postgres"),
 		MaxOpenConns:     config.GetInt("DB_MAX_OPEN_CONNS", 25),
 		MaxIdleConns:     config.GetInt("DB_MAX_IDLE_CONNS", 25),
 		MaxIdleTime:      config.GetDuration("DB_MAX_IDLE_TIME", 15*time.Minute),
 	}
 
-	db, err := database.Conectar()
+	dbConn, err := database.Conectar()
 	if err != nil {
 		fmt.Printf("Erro ao conectar ao banco de dados: %v\n", err)
 		return
 	}
-	defer db.Close()
+	defer dbConn.Close()
 
-	repositorio := repository.NewRepository(db)
-	service := service.NewService(repositorio, db)
+	fmt.Println("Sincronizando tabelas com o banco de dados...")
+	if err := db.IniciarTabelas(dbConn); err != nil {
+		fmt.Printf("Erro crítico ao sincronizar banco de dados: %v\n", err)
+		return
+	}
+
+	repositorio := repository.NewRepository(dbConn)
+	service := service.NewService(repositorio, dbConn)
 	controller := controller.NewController(service)
 
 	r := router.CarregarRotas(controller)

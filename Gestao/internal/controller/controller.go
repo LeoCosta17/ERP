@@ -10,6 +10,7 @@ type Controller struct {
 		RenderizarLoginPage(w http.ResponseWriter, r *http.Request)
 		RenderizarDashboardPage(w http.ResponseWriter, r *http.Request)
 		RenderizarDebitosPage(w http.ResponseWriter, r *http.Request)
+		RenderizarClientesPage(w http.ResponseWriter, r *http.Request)
 		RenderizarFornecedoresPage(w http.ResponseWriter, r *http.Request)
 		RenderizarCategoriasPage(w http.ResponseWriter, r *http.Request)
 	}

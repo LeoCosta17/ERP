@@ -14,7 +14,7 @@ func (r *UsuarioRepository) CriarUsuario(ctx context.Context, tx *sql.Tx, usuari
 	var id int64
 	err := tx.QueryRowContext(ctx, `
 		insert into tb_usuarios_gestao (nome, email, senha)
-		values (?, ?, ?)
+		values ($1, $2, $3)
 		returning id;
 	`, usuario.Nome, usuario.Email, usuario.Senha).Scan(&id)
 

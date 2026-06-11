@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"gestao/internal/model"
 )
 
@@ -22,7 +23,7 @@ func (r *DebitoRepository) LancarDebito(ctx context.Context, tx *sql.Tx, debito 
 			id_fornecedor, id_categoria, descricao, 
 			nr_documento, nr_nota_fiscal, valor, dt_entrada, dt_vencimento, 
 			nr_parcela, nr_total_parcelas, status
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PENDENTE')
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PENDENTE')
 	`
 	stmt, err := tx.PrepareContext(ctx, query)
 	if err != nil {
@@ -52,18 +53,18 @@ func (r *DebitoRepository) ListarDebitos(ctx context.Context, busca, vencimento,
 	var args []interface{}
 
 	if busca != "" {
-		query += " AND (f.razao_social LIKE ? OR f.id = ?)"
+		query += fmt.Sprintf(" AND (f.razao_social LIKE $%d OR f.id = $%d)", len(args)+1, len(args)+2)
 		buscaParam := "%" + busca + "%"
 		args = append(args, buscaParam, busca)
 	}
 
 	if vencimento != "" {
-		query += " AND d.dt_vencimento = ?"
+		query += fmt.Sprintf(" AND d.dt_vencimento = $%d", len(args)+1)
 		args = append(args, vencimento)
 	}
 
 	if status != "" {
-		query += " AND d.status = ?"
+		query += fmt.Sprintf(" AND d.status = $%d", len(args)+1)
 		args = append(args, status)
 	} else {
 		query += " AND d.status = 'PENDENTE'"
@@ -110,7 +111,7 @@ func (r *DebitoRepository) ListarDebitos(ctx context.Context, busca, vencimento,
 
 func (r *DebitoRepository) PagarDebito(ctx context.Context, tx *sql.Tx, id int64) error {
 
-	query := `SELECT status from tb_debitos WHERE id = ?`
+	query := `SELECT status from tb_debitos WHERE id = $1`
 	stmt, err := r.db.QueryContext(ctx, query, id)
 	if err != nil {
 		return err
@@ -128,7 +129,7 @@ func (r *DebitoRepository) PagarDebito(ctx context.Context, tx *sql.Tx, id int64
 		return DEBITO_QUITADO
 	}
 
-	query = "UPDATE tb_debitos SET status = 'PAGO' WHERE id = ?"
+	query = "UPDATE tb_debitos SET status = 'PAGO' WHERE id = $1"
 
 	result, err := tx.ExecContext(ctx, query, id)
 	if err != nil {
@@ -148,7 +149,7 @@ func (r *DebitoRepository) PagarDebito(ctx context.Context, tx *sql.Tx, id int64
 
 func (r *DebitoRepository) EditarDebito(ctx context.Context, tx *sql.Tx, id int64, debito *model.DebitoAvulsoCriar) error {
 
-	query := `SELECT status from tb_debitos WHERE id = ?`
+	query := `SELECT status from tb_debitos WHERE id = $1`
 	stmt, err := r.db.QueryContext(ctx, query, id)
 	if err != nil {
 		return err
@@ -168,10 +169,10 @@ func (r *DebitoRepository) EditarDebito(ctx context.Context, tx *sql.Tx, id int6
 
 	query = `
 		UPDATE tb_debitos SET 
-			id_fornecedor = ?, id_categoria = ?, descricao = ?, 
-			nr_documento = ?, nr_nota_fiscal = ?, valor = ?, dt_entrada = ?, dt_vencimento = ?, 
-			nr_parcela = ?, nr_total_parcelas = ?
-		WHERE id = ?
+			id_fornecedor = $1, id_categoria = $2, descricao = $3, 
+			nr_documento = $4, nr_nota_fiscal = $5, valor = $6, dt_entrada = $7, dt_vencimento = $8, 
+			nr_parcela = $9, nr_total_parcelas = $10
+		WHERE id = $11
 	`
 	result, err := tx.ExecContext(ctx, query,
 		debito.IDFornecedor, debito.IDCategoria, debito.Descricao,

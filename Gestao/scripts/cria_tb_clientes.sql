@@ -1,14 +1,14 @@
 create table if not exists tb_clientes(
-    id bigint auto_increment primary key,
+    id BIGSERIAL PRIMARY KEY,
     nome varchar(150) not null unique,
-    tipo enum('PF', 'PJ') not null,
+    tipo VARCHAR(50) not null,
     email varchar(200) unique default null,
-    telefone varchar(20) default null,
+    telefone varchar(20) unique default null,
     cpf varchar(14) unique default null,
     cnpj varchar(18) unique default null,
-    contribuinte enum('1','2','9') default null,
-    is_consumidor_final bool default false,
+    contribuinte VARCHAR(50) default null,
+    is_consumidor_final BOOLEAN DEFAULT FALSE,
     ie varchar(14) unique default null,
     created_at timestamp default current_timestamp,
-    updated_at timestamp default current_timestamp on update current_timestamp
+    updated_at timestamp default current_timestamp 
 );

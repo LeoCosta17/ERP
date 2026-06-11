@@ -15,7 +15,7 @@ func (r *ClienteRepository) CriarCliente(ctx context.Context, tx *sql.Tx, c *mod
 
 	query := `
 		INSERT INTO tb_clientes (nome, tipo, email, telefone, cpf, cnpj, contribuinte, is_consumidor_final, ie)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id, created_at;
 	`
 	err := tx.QueryRowContext(ctx, query, c.Nome, c.Tipo, c.Email, c.Telefone,
@@ -31,7 +31,7 @@ func (r *ClienteRepository) CriarCliente(ctx context.Context, tx *sql.Tx, c *mod
 		var endID int64
 		query = `
 			insert into tb_enderecos_clientes(id_cliente, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal)
-			values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+			values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 			returning id, created_at;
 		`
 		err := tx.QueryRowContext(
