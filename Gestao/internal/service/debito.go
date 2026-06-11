@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"gestao/internal/model"
 	"gestao/internal/repository"
+	"gestao/pkg/dbhelper"
 )
 
 type DebitoService struct {
@@ -17,39 +18,26 @@ func (s *DebitoService) LancarDebito(ctx context.Context, debito *model.DebitoAv
 		return err
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	if err := s.repository.Debitos.LancarDebito(ctx, tx, debito); err != nil {
-		return err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		return s.repository.Debitos.LancarDebito(ctx, tx, debito)
+	})
+	return err
 }
 
 func (s *DebitoService) ListarDebitos(ctx context.Context, busca, vencimento, status string) ([]*model.Debito, error) {
-	return s.repository.Debitos.ListarDebitos(ctx, busca, vencimento, status)
+	var debitos []*model.Debito
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		debitos, errTx = s.repository.Debitos.ListarDebitos(ctx, tx, busca, vencimento, status)
+		return errTx
+	})
+	return debitos, err
 }
 
 func (s *DebitoService) PagarDebito(ctx context.Context, id int64) error {
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	if err := s.repository.Debitos.PagarDebito(ctx, tx, id); err != nil {
-		return err
-	}
-
-	return tx.Commit()
+	return dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		return s.repository.Debitos.PagarDebito(ctx, tx, id)
+	})
 }
 
 func (s *DebitoService) EditarDebito(ctx context.Context, id int64, debito *model.DebitoAvulsoCriar) error {
@@ -57,15 +45,8 @@ func (s *DebitoService) EditarDebito(ctx context.Context, id int64, debito *mode
 		return err
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	if err := s.repository.Debitos.EditarDebito(ctx, tx, id, debito); err != nil {
-		return err
-	}
-
-	return tx.Commit()
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		return s.repository.Debitos.EditarDebito(ctx, tx, id, debito)
+	})
+	return err
 }

@@ -24,9 +24,9 @@ func (r *CategoriaRepository) CriarCategoria(ctx context.Context, tx *sql.Tx, c 
 	return c, nil
 }
 
-func (r *CategoriaRepository) ListarCategorias(ctx context.Context) ([]*model.CategoriaDebito, error) {
+func (r *CategoriaRepository) ListarCategorias(ctx context.Context, tx *sql.Tx) ([]*model.CategoriaDebito, error) {
 	query := `SELECT id, nome FROM tb_categorias_debito ORDER BY nome ASC`
-	rows, err := r.db.QueryContext(ctx, query)
+	rows, err := tx.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}

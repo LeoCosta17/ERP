@@ -15,19 +15,19 @@ func NewDashboardRepository(db *sql.DB) *DashboardRepository {
 }
 
 // GetTotalDebitosAtrasados retorna o valor total de débitos vencidos e não pagos
-func (r *DashboardRepository) GetTotalDebitosAtrasados(ctx context.Context) (float64, error) {
+func (r *DashboardRepository) GetTotalDebitosAtrasados(ctx context.Context, tx *sql.Tx) (float64, error) {
 	query := `
 		SELECT COALESCE(SUM(valor), 0) 
 		FROM tb_debitos 
 		WHERE status = 'PENDENTE' AND dt_vencimento < CURRENT_DATE
 	`
 	var total float64
-	err := r.db.QueryRowContext(ctx, query).Scan(&total)
+	err := tx.QueryRowContext(ctx, query).Scan(&total)
 	return total, err
 }
 
 // GetTotalDebitosSemana retorna o valor total de débitos que vencem na semana (Segunda a Domingo)
-func (r *DashboardRepository) GetTotalDebitosSemana(ctx context.Context, inicioSemana, fimSemana time.Time) (float64, error) {
+func (r *DashboardRepository) GetTotalDebitosSemana(ctx context.Context, tx *sql.Tx, inicioSemana, fimSemana time.Time) (float64, error) {
 	query := `
 		SELECT COALESCE(SUM(valor), 0) 
 		FROM tb_debitos 
@@ -36,7 +36,7 @@ func (r *DashboardRepository) GetTotalDebitosSemana(ctx context.Context, inicioS
 		  AND dt_vencimento <= $2
 	`
 	var total float64
-	err := r.db.QueryRowContext(ctx, query, inicioSemana.Format("2006-01-02"), fimSemana.Format("2006-01-02")).Scan(&total)
+	err := tx.QueryRowContext(ctx, query, inicioSemana.Format("2006-01-02"), fimSemana.Format("2006-01-02")).Scan(&total)
 	return total, err
 }
 
@@ -46,7 +46,7 @@ type CategoriaGasto struct {
 }
 
 // GetDespesasPorCategoria retorna as categorias que mais geraram gastos no mês atual
-func (r *DashboardRepository) GetDespesasPorCategoria(ctx context.Context, inicioMes, fimMes time.Time) ([]CategoriaGasto, error) {
+func (r *DashboardRepository) GetDespesasPorCategoria(ctx context.Context, tx *sql.Tx, inicioMes, fimMes time.Time) ([]CategoriaGasto, error) {
 	query := `
 		SELECT 
 			COALESCE(c.nome, 'Sem Categoria') as categoria, 
@@ -58,7 +58,7 @@ func (r *DashboardRepository) GetDespesasPorCategoria(ctx context.Context, inici
 		ORDER BY total DESC
 		LIMIT 5
 	`
-	rows, err := r.db.QueryContext(ctx, query, inicioMes.Format("2006-01-02"), fimMes.Format("2006-01-02"))
+	rows, err := tx.QueryContext(ctx, query, inicioMes.Format("2006-01-02"), fimMes.Format("2006-01-02"))
 	if err != nil {
 		return nil, err
 	}

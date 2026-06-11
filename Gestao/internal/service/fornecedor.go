@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"gestao/internal/model"
 	"gestao/internal/repository"
+	"gestao/pkg/dbhelper"
 )
 
 type FornecedorService struct {
@@ -13,7 +14,13 @@ type FornecedorService struct {
 }
 
 func (s *FornecedorService) ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error) {
-	return s.repository.Fornecedores.ListarFornecedores(ctx, busca)
+	var fornecedores []*model.Fornecedor
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		fornecedores, errTx = s.repository.Fornecedores.ListarFornecedores(ctx, tx, busca)
+		return errTx
+	})
+	return fornecedores, err
 }
 
 // CriarFornecedor gerencia a regra de negócio para criar um fornecedor.
@@ -23,18 +30,13 @@ func (s *FornecedorService) CriarFornecedor(ctx context.Context, f *model.Fornec
 		return nil, err
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
+	var fornecedorCriado *model.Fornecedor
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		fornecedorCriado, errTx = s.repository.Fornecedores.CriarFornecedor(ctx, tx, f)
+		return errTx
+	})
 	if err != nil {
-		return nil, err
-	}
-
-	fornecedorCriado, err := s.repository.Fornecedores.CriarFornecedor(ctx, tx, f)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
@@ -42,7 +44,13 @@ func (s *FornecedorService) CriarFornecedor(ctx context.Context, f *model.Fornec
 }
 
 func (s *FornecedorService) ObterFornecedorPorID(ctx context.Context, id int64) (*model.Fornecedor, error) {
-	return s.repository.Fornecedores.ObterFornecedorPorID(ctx, id)
+	var fornecedor *model.Fornecedor
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		fornecedor, errTx = s.repository.Fornecedores.ObterFornecedorPorID(ctx, tx, id)
+		return errTx
+	})
+	return fornecedor, err
 }
 
 func (s *FornecedorService) AtualizarFornecedor(ctx context.Context, id int64, f *model.Fornecedor) error {
@@ -50,20 +58,7 @@ func (s *FornecedorService) AtualizarFornecedor(ctx context.Context, id int64, f
 		return err
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	err = s.repository.Fornecedores.AtualizarFornecedor(ctx, tx, id, f)
-	if err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
+	return dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		return s.repository.Fornecedores.AtualizarFornecedor(ctx, tx, id, f)
+	})
 }

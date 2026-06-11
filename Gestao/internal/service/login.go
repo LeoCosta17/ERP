@@ -6,6 +6,7 @@ import (
 	"errors"
 	"gestao/internal/model"
 	"gestao/internal/repository"
+	"gestao/pkg/dbhelper"
 )
 
 type LoginService struct {
@@ -18,23 +19,21 @@ func (s *LoginService) Login(ctx context.Context, usuario *model.UsuarioLogin) (
 		return 0, "", err
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return 0, "", err
-	}
-	defer tx.Rollback()
-
-	id, nome, senhaDB, err := s.repository.Login.Login(ctx, tx, usuario.Email)
+	var id uint64
+	var nome string
+	var senhaDB string
+	
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		id, nome, senhaDB, errTx = s.repository.Login.Login(ctx, tx, usuario.Email)
+		return errTx
+	})
 	if err != nil {
 		return 0, "", err
 	}
 
 	if err := usuario.ValidarSenha(senhaDB); err != nil {
 		return 0, "", errors.New("dados login inválidos")
-	}
-
-	if err := tx.Commit(); err != nil {
-		return 0, "", err
 	}
 
 	return id, nome, nil

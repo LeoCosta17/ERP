@@ -10,7 +10,7 @@ type FornecedorRepository struct {
 	db *sql.DB
 }
 
-func (r *FornecedorRepository) ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error) {
+func (r *FornecedorRepository) ListarFornecedores(ctx context.Context, tx *sql.Tx, busca string) ([]*model.Fornecedor, error) {
 	query := `
 		SELECT id, razao_social, cnpj, inscricao_estadual, email, created_at, updated_at
 		FROM tb_fornecedores
@@ -21,9 +21,9 @@ func (r *FornecedorRepository) ListarFornecedores(ctx context.Context, busca str
 	if busca != "" {
 		query += " WHERE razao_social LIKE $1 OR cnpj LIKE $2"
 		buscaParam := "%" + busca + "%"
-		rows, err = r.db.QueryContext(ctx, query, buscaParam, buscaParam)
+		rows, err = tx.QueryContext(ctx, query, buscaParam, buscaParam)
 	} else {
-		rows, err = r.db.QueryContext(ctx, query)
+		rows, err = tx.QueryContext(ctx, query)
 	}
 
 	if err != nil {
@@ -104,14 +104,14 @@ func (r *FornecedorRepository) CriarFornecedor(ctx context.Context, tx *sql.Tx, 
 	return f, nil
 }
 
-func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int64) (*model.Fornecedor, error) {
+func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, tx *sql.Tx, id int64) (*model.Fornecedor, error) {
 	queryFornecedor := `
 		SELECT id, razao_social, cnpj, inscricao_estadual, email, created_at, updated_at
 		FROM tb_fornecedores
 		WHERE id = $1
 	`
 	f := &model.Fornecedor{}
-	err := r.db.QueryRowContext(ctx, queryFornecedor, id).Scan(
+	err := tx.QueryRowContext(ctx, queryFornecedor, id).Scan(
 		&f.ID, &f.RazaoSocial, &f.CNPJ, &f.InscricaoEstadual, &f.Email, &f.CreatedAt, &f.UpdatedAt,
 	)
 	if err != nil {
@@ -126,7 +126,7 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int6
 		FROM tb_enderecos_fornecedores
 		WHERE id_fornecedor = $1
 	`
-	rowsEnd, err := r.db.QueryContext(ctx, queryEnderecos, id)
+	rowsEnd, err := tx.QueryContext(ctx, queryEnderecos, id)
 	if err == nil {
 		defer rowsEnd.Close()
 		for rowsEnd.Next() {
@@ -146,7 +146,7 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, id int6
 		FROM tb_telefones_fornecedores
 		WHERE id_fornecedor = $1
 	`
-	rowsTel, err := r.db.QueryContext(ctx, queryTelefones, id)
+	rowsTel, err := tx.QueryContext(ctx, queryTelefones, id)
 	if err == nil {
 		defer rowsTel.Close()
 		for rowsTel.Next() {

@@ -4,20 +4,24 @@ import (
 	"gestao/config"
 	"gestao/internal/auth"
 	"gestao/internal/controller"
+	"gestao/internal/middleware"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	chi_middleware "github.com/go-chi/chi/v5/middleware"
 )
 
 func CarregarRotas(c *controller.Controller) *chi.Mux {
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-	r.Use(middleware.Throttle(config.GetInt("ROUTER_MAX_REQUESTS_PER_MINUTE", 10)))
+	r.Use(chi_middleware.Logger)
+	r.Use(chi_middleware.Recoverer)
+	r.Use(chi_middleware.Throttle(config.GetInt("ROUTER_MAX_REQUESTS_PER_MINUTE", 10)))
+	
+	// Adiciona nosso middleware de captura de Tenant
+	r.Use(middleware.TenantMiddleware)
 
 	workDir, err := os.Getwd()
 	if err != nil {

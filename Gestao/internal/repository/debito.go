@@ -39,7 +39,7 @@ func (r *DebitoRepository) LancarDebito(ctx context.Context, tx *sql.Tx, debito 
 	return err
 }
 
-func (r *DebitoRepository) ListarDebitos(ctx context.Context, busca, vencimento, status string) ([]*model.Debito, error) {
+func (r *DebitoRepository) ListarDebitos(ctx context.Context, tx *sql.Tx, busca, vencimento, status string) ([]*model.Debito, error) {
 	query := `
 		SELECT d.id, d.id_fornecedor, d.id_categoria, d.descricao, d.nr_documento, d.nr_nota_fiscal, 
 		       d.valor, d.dt_entrada, d.dt_vencimento, d.nr_parcela, d.nr_total_parcelas, d.status, d.created_at, d.updated_at,
@@ -72,7 +72,7 @@ func (r *DebitoRepository) ListarDebitos(ctx context.Context, busca, vencimento,
 
 	query += " ORDER BY d.dt_vencimento ASC"
 
-	rows, err := r.db.QueryContext(ctx, query, args...)
+	rows, err := tx.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (r *DebitoRepository) ListarDebitos(ctx context.Context, busca, vencimento,
 func (r *DebitoRepository) PagarDebito(ctx context.Context, tx *sql.Tx, id int64) error {
 
 	query := `SELECT status from tb_debitos WHERE id = $1`
-	stmt, err := r.db.QueryContext(ctx, query, id)
+	stmt, err := tx.QueryContext(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -150,7 +150,7 @@ func (r *DebitoRepository) PagarDebito(ctx context.Context, tx *sql.Tx, id int64
 func (r *DebitoRepository) EditarDebito(ctx context.Context, tx *sql.Tx, id int64, debito *model.DebitoAvulsoCriar) error {
 
 	query := `SELECT status from tb_debitos WHERE id = $1`
-	stmt, err := r.db.QueryContext(ctx, query, id)
+	stmt, err := tx.QueryContext(ctx, query, id)
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"gestao/internal/model"
 	"gestao/internal/repository"
+	"gestao/pkg/dbhelper"
 )
 
 type ClienteService struct {
@@ -18,21 +19,15 @@ func (s *ClienteService) CriarCliente(ctx context.Context, c *model.Cliente) (*m
 		return nil, err
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
+	var clienteCriado *model.Cliente
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		clienteCriado, errTx = s.repository.Clientes.CriarCliente(ctx, tx, c)
+		return errTx
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	cliente, err := s.repository.Clientes.CriarCliente(ctx, tx, c)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	return cliente, nil
+	return clienteCriado, nil
 }

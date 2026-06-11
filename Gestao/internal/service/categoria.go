@@ -6,6 +6,7 @@ import (
 	"errors"
 	"gestao/internal/model"
 	"gestao/internal/repository"
+	"gestao/pkg/dbhelper"
 )
 
 type CategoriaService struct {
@@ -18,18 +19,13 @@ func (s *CategoriaService) CriarCategoria(ctx context.Context, c *model.Categori
 		return nil, errors.New("o nome da categoria é obrigatório")
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
+	var categoriaCriada *model.CategoriaDebito
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		categoriaCriada, errTx = s.repository.Categorias.CriarCategoria(ctx, tx, c)
+		return errTx
+	})
 	if err != nil {
-		return nil, err
-	}
-
-	categoriaCriada, err := s.repository.Categorias.CriarCategoria(ctx, tx, c)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 
@@ -37,5 +33,11 @@ func (s *CategoriaService) CriarCategoria(ctx context.Context, c *model.Categori
 }
 
 func (s *CategoriaService) ListarCategorias(ctx context.Context) ([]*model.CategoriaDebito, error) {
-	return s.repository.Categorias.ListarCategorias(ctx)
+	var categorias []*model.CategoriaDebito
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		categorias, errTx = s.repository.Categorias.ListarCategorias(ctx, tx)
+		return errTx
+	})
+	return categorias, err
 }

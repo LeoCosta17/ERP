@@ -2,17 +2,19 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"gestao/internal/repository"
-	"sync"
+	"gestao/pkg/dbhelper"
 	"time"
 )
 
 type DashboardService struct {
 	Repo *repository.DashboardRepository
+	db   *sql.DB
 }
 
-func NewDashboardService(repo *repository.DashboardRepository) *DashboardService {
-	return &DashboardService{Repo: repo}
+func NewDashboardService(repo *repository.DashboardRepository, db *sql.DB) *DashboardService {
+	return &DashboardService{Repo: repo, db: db}
 }
 
 type ResumoDashboard struct {
@@ -41,46 +43,31 @@ func (s *DashboardService) ObterResumo(ctx context.Context) (*ResumoDashboard, e
 	fimMes := inicioMes.AddDate(0, 1, -1)
 
 	resumo := &ResumoDashboard{}
-	var errGeral error
-	var wg sync.WaitGroup
-
-	// Executa as queries em paralelo
-	wg.Add(3)
-
-	go func() {
-		defer wg.Done()
-		total, err := s.Repo.GetTotalDebitosAtrasados(ctx)
+	
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		totalVencido, err := s.Repo.GetTotalDebitosAtrasados(ctx, tx)
 		if err != nil {
-			errGeral = err
-			return
+			return err
 		}
-		resumo.TotalVencido = total
-	}()
+		resumo.TotalVencido = totalVencido
 
-	go func() {
-		defer wg.Done()
-		total, err := s.Repo.GetTotalDebitosSemana(ctx, inicioSemana, fimSemana)
+		totalSemana, err := s.Repo.GetTotalDebitosSemana(ctx, tx, inicioSemana, fimSemana)
 		if err != nil {
-			errGeral = err
-			return
+			return err
 		}
-		resumo.TotalSemana = total
-	}()
+		resumo.TotalSemana = totalSemana
 
-	go func() {
-		defer wg.Done()
-		cats, err := s.Repo.GetDespesasPorCategoria(ctx, inicioMes, fimMes)
+		cats, err := s.Repo.GetDespesasPorCategoria(ctx, tx, inicioMes, fimMes)
 		if err != nil {
-			errGeral = err
-			return
+			return err
 		}
 		resumo.DespesasCategoria = cats
-	}()
 
-	wg.Wait()
+		return nil
+	})
 
-	if errGeral != nil {
-		return nil, errGeral
+	if err != nil {
+		return nil, err
 	}
 
 	// TODO: Quando o módulo de Vendas for criado, substituir os mocks abaixo por chamadas ao repository

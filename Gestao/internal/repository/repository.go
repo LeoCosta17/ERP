@@ -18,19 +18,19 @@ type Repository struct {
 	}
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, tx *sql.Tx, f *model.Fornecedor) (*model.Fornecedor, error)
-		ListarFornecedores(ctx context.Context, busca string) ([]*model.Fornecedor, error)
-		ObterFornecedorPorID(ctx context.Context, id int64) (*model.Fornecedor, error)
+		ListarFornecedores(ctx context.Context, tx *sql.Tx, busca string) ([]*model.Fornecedor, error)
+		ObterFornecedorPorID(ctx context.Context, tx *sql.Tx, id int64) (*model.Fornecedor, error)
 		AtualizarFornecedor(ctx context.Context, tx *sql.Tx, id int64, f *model.Fornecedor) error
 	}
 	Debitos interface {
 		LancarDebito(ctx context.Context, tx *sql.Tx, debito *model.DebitoAvulsoCriar) error
-		ListarDebitos(ctx context.Context, busca, vencimento, status string) ([]*model.Debito, error)
+		ListarDebitos(ctx context.Context, tx *sql.Tx, busca, vencimento, status string) ([]*model.Debito, error)
 		PagarDebito(ctx context.Context, tx *sql.Tx, id int64) error
 		EditarDebito(ctx context.Context, tx *sql.Tx, id int64, debito *model.DebitoAvulsoCriar) error
 	}
 	Categorias interface {
 		CriarCategoria(ctx context.Context, tx *sql.Tx, c *model.CategoriaDebito) (*model.CategoriaDebito, error)
-		ListarCategorias(ctx context.Context) ([]*model.CategoriaDebito, error)
+		ListarCategorias(ctx context.Context, tx *sql.Tx) ([]*model.CategoriaDebito, error)
 	}
 	Dashboard *DashboardRepository
 }

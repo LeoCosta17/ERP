@@ -62,6 +62,6 @@ func NewService(repository *repository.Repository, db *sql.DB) *Service {
 			repository: repository,
 			db:         db,
 		},
-		Dashboard: NewDashboardService(repository.Dashboard),
+		Dashboard: NewDashboardService(repository.Dashboard, db),
 	}
 }

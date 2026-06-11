@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"gestao/internal/model"
 	"gestao/internal/repository"
+	"gestao/pkg/dbhelper"
 )
 
 type UsuarioService struct {
@@ -18,22 +19,17 @@ func (s *UsuarioService) CriarUsuario(ctx context.Context, usuario *model.Usuari
 		return nil, err
 	}
 
-	tx, err := s.db.BeginTx(ctx, nil)
-	if err != nil {
-		return nil, err
-	}
-
 	if err := usuario.HashSenha(); err != nil {
 		return nil, err
 	}
 
-	usuarioCriado, err := s.repository.Usuarios.CriarUsuario(ctx, tx, usuario)
+	var usuarioCriado *model.UsuarioBasico
+	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
+		var errTx error
+		usuarioCriado, errTx = s.repository.Usuarios.CriarUsuario(ctx, tx, usuario)
+		return errTx
+	})
 	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
-
-	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 

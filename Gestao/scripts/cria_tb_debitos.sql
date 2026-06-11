@@ -1,4 +1,4 @@
-CREATE TABLE tb_debitos (
+CREATE TABLE IF NOT EXISTS tb_debitos (
     id BIGSERIAL PRIMARY KEY,
     id_fornecedor BIGINT NOT NULL,
     id_categoria BIGINT,
