@@ -16,6 +16,7 @@ type Service struct {
 	}
 	Clientes interface {
 		CriarCliente(ctx context.Context, c *model.Cliente) (*model.Cliente, error)
+		ListarClientes(ctx context.Context, busca string) ([]model.Cliente, error)
 	}
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, f *model.Fornecedor) (*model.Fornecedor, error)

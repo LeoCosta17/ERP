@@ -42,16 +42,23 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/login", c.Login.Login)
 		r.Post("/usuarios", c.Usuarios.CriarUsuario)
+
 		r.Get("/fornecedores", auth.Autenticar(c.Fornecedores.ListarFornecedores))
 		r.Post("/fornecedores", auth.Autenticar(c.Fornecedores.CriarFornecedor))
 		r.Get("/fornecedores/{id}", auth.Autenticar(c.Fornecedores.ObterFornecedor))
 		r.Put("/fornecedores/{id}", auth.Autenticar(c.Fornecedores.AtualizarFornecedor))
+
 		r.Get("/categorias", auth.Autenticar(c.Categorias.ListarCategorias))
 		r.Post("/categorias", auth.Autenticar(c.Categorias.CriarCategoria))
+
 		r.Get("/debitos", auth.Autenticar(c.Debitos.ListarDebitos))
 		r.Post("/debitos", auth.Autenticar(c.Debitos.CriarDebitoAvulso))
 		r.Put("/debitos/{id}", auth.Autenticar(c.Debitos.EditarDebito))
 		r.Put("/debitos/{id}/pagar", auth.Autenticar(c.Debitos.PagarDebito))
+
+		r.Get("/clientes", auth.Autenticar(c.Clientes.ListarClientes))
+		r.Post("/clientes", auth.Autenticar(c.Clientes.CriarCliente))
+
 		r.Get("/dashboard/resumo", auth.Autenticar(c.Dashboard.ResumoDashboard))
 	})
 

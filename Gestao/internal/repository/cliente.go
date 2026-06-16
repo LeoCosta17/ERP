@@ -10,6 +10,20 @@ type ClienteRepository struct {
 	db *sql.DB
 }
 
+func nullIfEmpty(s string) interface{} {
+	if s == "" {
+		return nil
+	}
+	return s
+}
+
+func nullIfZeroInt(i model.IndContribuinte) interface{} {
+	if i == 0 {
+		return nil
+	}
+	return i
+}
+
 func (r *ClienteRepository) CriarCliente(ctx context.Context, tx *sql.Tx, c *model.Cliente) (*model.Cliente, error) {
 	var id int64
 
@@ -18,8 +32,8 @@ func (r *ClienteRepository) CriarCliente(ctx context.Context, tx *sql.Tx, c *mod
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id, created_at;
 	`
-	err := tx.QueryRowContext(ctx, query, c.Nome, c.Tipo, c.Email, c.Telefone,
-		c.CPF, c.CNPJ, c.Contribuinte, c.IsConsumidorFinal, c.IE).Scan(
+	err := tx.QueryRowContext(ctx, query, c.Nome, c.Tipo, nullIfEmpty(c.Email), nullIfEmpty(c.Telefone),
+		nullIfEmpty(c.CPF), nullIfEmpty(c.CNPJ), nullIfZeroInt(c.Contribuinte), c.IsConsumidorFinal, nullIfEmpty(c.IE)).Scan(
 		&id, &c.CreatedAt,
 	)
 	if err != nil {
@@ -50,4 +64,53 @@ func (r *ClienteRepository) CriarCliente(ctx context.Context, tx *sql.Tx, c *mod
 	}
 
 	return c, nil
+}
+
+func (r *ClienteRepository) ListarClientes(ctx context.Context, busca string) ([]model.Cliente, error) {
+	query := `
+		SELECT id, nome, tipo, email, telefone, cpf, cnpj 
+		FROM tb_clientes
+	`
+	var rows *sql.Rows
+	var err error
+
+	if busca != "" {
+		query += " WHERE nome ILIKE $1 OR cpf ILIKE $2 OR cnpj ILIKE $3"
+		buscaParam := "%" + busca + "%"
+		query += " ORDER BY id DESC"
+		rows, err = r.db.QueryContext(ctx, query, buscaParam, buscaParam, buscaParam)
+	} else {
+		query += " ORDER BY id DESC"
+		rows, err = r.db.QueryContext(ctx, query)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var clientes []model.Cliente
+	for rows.Next() {
+		var c model.Cliente
+		var email, telefone, cpf, cnpj sql.NullString
+		
+		if err := rows.Scan(
+			&c.ID, &c.Nome, &c.Tipo, &email, &telefone, &cpf, &cnpj,
+		); err != nil {
+			return nil, err
+		}
+		
+		c.Email = email.String
+		c.Telefone = telefone.String
+		c.CPF = cpf.String
+		c.CNPJ = cnpj.String
+		
+		clientes = append(clientes, c)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return clientes, nil
 }

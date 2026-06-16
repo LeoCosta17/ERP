@@ -15,6 +15,7 @@ type Repository struct {
 	}
 	Clientes interface {
 		CriarCliente(ctx context.Context, tx *sql.Tx, c *model.Cliente) (*model.Cliente, error)
+		ListarClientes(ctx context.Context, busca string) ([]model.Cliente, error)
 	}
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, tx *sql.Tx, f *model.Fornecedor) (*model.Fornecedor, error)

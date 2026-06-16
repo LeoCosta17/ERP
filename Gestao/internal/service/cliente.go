@@ -31,3 +31,7 @@ func (s *ClienteService) CriarCliente(ctx context.Context, c *model.Cliente) (*m
 
 	return clienteCriado, nil
 }
+
+func (s *ClienteService) ListarClientes(ctx context.Context, busca string) ([]model.Cliente, error) {
+	return s.repository.Clientes.ListarClientes(ctx, busca)
+}

@@ -20,6 +20,10 @@ type Controller struct {
 	Usuarios interface {
 		CriarUsuario(w http.ResponseWriter, r *http.Request)
 	}
+	Clientes interface {
+		CriarCliente(w http.ResponseWriter, r *http.Request)
+		ListarClientes(w http.ResponseWriter, r *http.Request)
+	}
 	Fornecedores interface {
 		CriarFornecedor(w http.ResponseWriter, r *http.Request)
 		ListarFornecedores(w http.ResponseWriter, r *http.Request)
@@ -46,6 +50,7 @@ func NewController(service *service.Service) *Controller {
 		View:         &ViewController{},
 		Login:        &LoginController{service: service},
 		Usuarios:     &UsuarioController{service: service},
+		Clientes:     &ClienteController{service: service},
 		Fornecedores: &FornecedorController{service: service},
 		Categorias:   &CategoriaController{service: service},
 		Debitos:      &DebitoController{service: service},
