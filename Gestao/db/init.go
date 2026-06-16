@@ -35,7 +35,7 @@ func IniciarTabelas(db *sql.DB) error {
 		if err != nil {
 			return fmt.Errorf("erro ao ler arquivo %s: %w", path, err)
 		}
-		
+
 		// Executa o script inteiro no banco
 		_, err = db.Exec(string(content))
 		if err != nil {

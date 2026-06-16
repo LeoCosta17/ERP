@@ -20,12 +20,12 @@ func TenantMiddleware(next http.Handler) http.Handler {
 		} else {
 			// Extrai o subdomínio (primeira parte antes do ponto)
 			partes := strings.Split(host, ".")
-			
-			// Se tiver pelo menos "subdominio.dominio.com" (3 partes) 
+
+			// Se tiver pelo menos "subdominio.dominio.com" (3 partes)
 			// Ou "subdominio.dominio.com.br" (4 partes)
-			if len(partes) > 2 { 
+			if len(partes) > 2 {
 				subdominio := partes[0]
-				
+
 				if subdominio == "admin" || subdominio == "www" {
 					schemaName = "public"
 				} else {
@@ -39,7 +39,7 @@ func TenantMiddleware(next http.Handler) http.Handler {
 
 		// Injeta no contexto
 		ctx := context.WithValue(r.Context(), dbhelper.SchemaKey, schemaName)
-		
+
 		// Segue o fluxo passando o novo contexto
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

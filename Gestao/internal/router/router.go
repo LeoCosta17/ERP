@@ -19,7 +19,7 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 	r.Use(chi_middleware.Logger)
 	r.Use(chi_middleware.Recoverer)
 	r.Use(chi_middleware.Throttle(config.GetInt("ROUTER_MAX_REQUESTS_PER_MINUTE", 10)))
-	
+
 	// Adiciona nosso middleware de captura de Tenant
 	r.Use(middleware.TenantMiddleware)
 

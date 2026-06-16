@@ -13,9 +13,9 @@ type UsuarioRepository struct {
 func (r *UsuarioRepository) CriarUsuario(ctx context.Context, tx *sql.Tx, usuario *model.UsuarioCriar) (*model.UsuarioBasico, error) {
 	var id int64
 	err := tx.QueryRowContext(ctx, `
-		insert into tb_usuarios_gestao (nome, email, senha)
-		values ($1, $2, $3)
-		returning id;
+		INSERT INTO tb_usuarios_gestao (nome, email, senha)
+		VALUES ($1, $2, $3)
+		RETURNING id;
 	`, usuario.Nome, usuario.Email, usuario.Senha).Scan(&id)
 
 	if err != nil {
@@ -23,8 +23,8 @@ func (r *UsuarioRepository) CriarUsuario(ctx context.Context, tx *sql.Tx, usuari
 	}
 
 	return &model.UsuarioBasico{
-		ID:        id,
-		Nome:      usuario.Nome,
-		Email:     usuario.Email,
+		ID:    id,
+		Nome:  usuario.Nome,
+		Email: usuario.Email,
 	}, nil
 }
