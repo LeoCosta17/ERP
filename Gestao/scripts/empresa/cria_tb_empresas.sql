@@ -4,6 +4,7 @@ create table if not exists tb_empresas(
     nome_fantasia varchar(100) not null,
     cnpj varchar(20) not null,
     ativo boolean default true,
+    schema varchar(200) not null unique,
     data_criacao timestamp default current_timestamp,
     data_atualizacao timestamp default current_timestamp 
 );

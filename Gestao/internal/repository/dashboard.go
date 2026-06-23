@@ -17,8 +17,8 @@ func NewDashboardRepository(db *sql.DB) *DashboardRepository {
 // GetTotalDebitosAtrasados retorna o valor total de débitos vencidos e não pagos
 func (r *DashboardRepository) GetTotalDebitosAtrasados(ctx context.Context, tx *sql.Tx) (float64, error) {
 	query := `
-		SELECT COALESCE(SUM(valor), 0) 
-		FROM tb_debitos 
+		SELECT COALESCE(SUM(valor), 0)
+		FROM tb_debitos
 		WHERE status = 'PENDENTE' AND dt_vencimento < CURRENT_DATE
 	`
 	var total float64
@@ -29,10 +29,10 @@ func (r *DashboardRepository) GetTotalDebitosAtrasados(ctx context.Context, tx *
 // GetTotalDebitosSemana retorna o valor total de débitos que vencem na semana (Segunda a Domingo)
 func (r *DashboardRepository) GetTotalDebitosSemana(ctx context.Context, tx *sql.Tx, inicioSemana, fimSemana time.Time) (float64, error) {
 	query := `
-		SELECT COALESCE(SUM(valor), 0) 
-		FROM tb_debitos 
-		WHERE status = 'PENDENTE' 
-		  AND dt_vencimento >= $1 
+		SELECT COALESCE(SUM(valor), 0)
+		FROM tb_debitos
+		WHERE status = 'PENDENTE'
+		  AND dt_vencimento >= $1
 		  AND dt_vencimento <= $2
 	`
 	var total float64
@@ -48,8 +48,8 @@ type CategoriaGasto struct {
 // GetDespesasPorCategoria retorna as categorias que mais geraram gastos no mês atual
 func (r *DashboardRepository) GetDespesasPorCategoria(ctx context.Context, tx *sql.Tx, inicioMes, fimMes time.Time) ([]CategoriaGasto, error) {
 	query := `
-		SELECT 
-			COALESCE(c.nome, 'Sem Categoria') as categoria, 
+		SELECT
+			COALESCE(c.nome, 'Sem Categoria') as categoria,
 			SUM(d.valor) as total
 		FROM tb_debitos d
 		LEFT JOIN tb_categorias_debito c ON d.id_categoria = c.id

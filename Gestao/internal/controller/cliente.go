@@ -6,6 +6,7 @@ import (
 	"gestao/pkg/requisicao"
 	"gestao/pkg/resposta"
 	"net/http"
+	"strconv"
 )
 
 type ClienteController struct {
@@ -42,4 +43,48 @@ func (c *ClienteController) ListarClientes(w http.ResponseWriter, r *http.Reques
 	}
 
 	resposta.Padrao(w, http.StatusOK, clientes)
+}
+
+func (c *ClienteController) ObterCliente(w http.ResponseWriter, r *http.Request) {
+	idParam := r.PathValue("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		resposta.Padrao(w, http.StatusBadRequest, map[string]string{"erro": "id inválido"})
+		return
+	}
+
+	cliente, err := c.service.Clientes.ObterClientePorID(r.Context(), id)
+	if err != nil {
+		resposta.Padrao(w, http.StatusInternalServerError, map[string]string{"erro": err.Error()})
+		return
+	}
+
+	if cliente == nil {
+		resposta.Padrao(w, http.StatusNotFound, map[string]string{"erro": "cliente não encontrado"})
+		return
+	}
+
+	resposta.Padrao(w, http.StatusOK, cliente)
+}
+
+func (c *ClienteController) AtualizarCliente(w http.ResponseWriter, r *http.Request) {
+	idParam := r.PathValue("id")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		resposta.Padrao(w, http.StatusBadRequest, map[string]string{"erro": "id inválido"})
+		return
+	}
+
+	var cliente model.Cliente
+	if err := requisicao.ProcessarRequisicao(w, r, &cliente); err != nil {
+		return
+	}
+
+	err = c.service.Clientes.AtualizarCliente(r.Context(), id, &cliente)
+	if err != nil {
+		resposta.Padrao(w, http.StatusBadRequest, map[string]string{"erro": err.Error()})
+		return
+	}
+
+	resposta.Padrao(w, http.StatusOK, map[string]string{"mensagem": "cliente atualizado com sucesso"})
 }

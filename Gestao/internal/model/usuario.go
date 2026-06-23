@@ -10,6 +10,7 @@ import (
 // Usuario representa a entidade principal que reflete a tabela tb_usuarios_gestao
 type Usuario struct {
 	ID           int64     `json:"id" db:"id"`
+	IDEmpresa    int64     `json:"id_empresa" db:"id_empresa"`
 	Nome         string    `json:"nome" db:"nome"`
 	CPF          *string   `json:"cpf,omitempty" db:"cpf"`
 	Telefone     *string   `json:"telefone,omitempty" db:"telefone"`

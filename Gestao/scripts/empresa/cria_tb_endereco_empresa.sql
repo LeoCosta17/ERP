@@ -1,6 +1,5 @@
 create table if not exists tb_endereco_empresa(
-    id BIGSERIAL PRIMARY KEY,
-    empresa_id bigint not null,
+    id bigserial primary KEY,
     logradouro varchar(100) not null,
     numero varchar(20) not null,
     bairro varchar(100) not null,
@@ -12,6 +11,5 @@ create table if not exists tb_endereco_empresa(
     cd_pais bigint not null default 1058,
     ativo boolean default true,
     data_criacao timestamp default current_timestamp,
-    data_atualizacao timestamp default current_timestamp ,
-    foreign key (empresa_id) references tb_empresas(id)
+    data_atualizacao timestamp default current_timestamp 
 );

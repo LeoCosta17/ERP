@@ -8,14 +8,16 @@ import (
 
 type Repository struct {
 	Login interface {
-		Login(ctx context.Context, tx *sql.Tx, email string) (uint64, string, string, error)
+		Login(ctx context.Context, email string) (uint64, string, string, string, error)
 	}
 	Usuarios interface {
 		CriarUsuario(ctx context.Context, tx *sql.Tx, usuario *model.UsuarioCriar) (*model.UsuarioBasico, error)
 	}
 	Clientes interface {
 		CriarCliente(ctx context.Context, tx *sql.Tx, c *model.Cliente) (*model.Cliente, error)
-		ListarClientes(ctx context.Context, busca string) ([]model.Cliente, error)
+		ListarClientes(ctx context.Context, tx *sql.Tx, busca string) ([]model.Cliente, error)
+		ObterClientePorID(ctx context.Context, tx *sql.Tx, id int64) (*model.Cliente, error)
+		AtualizarCliente(ctx context.Context, tx *sql.Tx, id int64, c *model.Cliente) error
 	}
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, tx *sql.Tx, f *model.Fornecedor) (*model.Fornecedor, error)

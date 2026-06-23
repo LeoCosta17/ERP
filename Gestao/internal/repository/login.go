@@ -9,18 +9,22 @@ type LoginRepository struct {
 	db *sql.DB
 }
 
-func (r *LoginRepository) Login(ctx context.Context, tx *sql.Tx, email string) (uint64, string, string, error) {
+func (r *LoginRepository) Login(ctx context.Context, email string) (uint64, string, string, string, error) {
 	var senhaDB string
 	var nome string
 	var id uint64
-	err := tx.QueryRowContext(ctx, `
-		select id, nome, senha from tb_usuarios_gestao
-		where email = $1;
-	`, email).Scan(&id, &nome, &senhaDB)
+	var schema string
+
+	err := r.db.QueryRowContext(ctx, `
+		select u.id, u.nome, u.senha, e.schema
+		from tb_usuarios_gestao u
+		join tb_empresas e on e.id = u.id_empresa
+		where u.email = $1;
+	`, email).Scan(&id, &nome, &senhaDB, &schema)
 
 	if err != nil {
-		return 0, "", "", err
+		return 0, "", "", "", err
 	}
 
-	return id, nome, senhaDB, nil
+	return id, nome, senhaDB, schema, nil
 }

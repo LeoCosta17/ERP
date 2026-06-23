@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS tb_fornecedores (
 
 create table if not exists tb_usuarios_gestao(
     id bigint generated always as identity primary key ,
+    id_empresa bigint not null,
     nome varchar(255) not null,
     cpf varchar(14) unique,
     telefone varchar(20) unique,
@@ -48,31 +49,27 @@ create table if not exists tb_usuarios_gestao(
     senha varchar(255) not null,
     criado_em timestamp default current_timestamp,
     atualizado_em timestamp default current_timestamp ,
-    ativo boolean default false
+    ativo boolean default false,
+    foreign key (id_empresa) references tb_empresas(id) on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS tb_credenciais_empresa (
     id BIGINT PRIMARY KEY ,
-    id_empresa BIGINT NOT NULL,
     tp_ambiente SMALLINT NOT NULL, -- 1 para Produção, 2 para Homologação
     certificado_digital BYTEA NOT NULL, -- BYTEA garante espaço seguro para o binário no Postgres
     senha_criptografada VARCHAR(255) NOT NULL,
     id_csc VARCHAR(6) NOT NULL, -- O identificador sequencial fornecido pela SEFAZ
     csc_nfe VARCHAR(255) NOT NULL, -- O token secreto
-    FOREIGN KEY (id_empresa) REFERENCES tb_empresas(id),
-    CONSTRAINT uq_empresa_ambiente UNIQUE (id_empresa, tp_ambiente) -- Garante uma config por ambiente
+    CONSTRAINT uq_empresa_ambiente UNIQUE (tp_ambiente) -- Garante uma config por ambiente
 );
 
 CREATE TABLE IF NOT EXISTS tb_config_fiscais_empresa (
     id BIGINT PRIMARY KEY ,
-    id_empresa BIGINT NOT NULL UNIQUE,
-    cd_regime_tributario INT NOT NULL,
-    FOREIGN KEY (id_empresa) REFERENCES tb_empresas(id)
+    cd_regime_tributario INT NOT NULL
 );
 
 create table if not exists tb_endereco_empresa(
     id BIGSERIAL PRIMARY KEY,
-    empresa_id bigint not null,
     logradouro varchar(100) not null,
     numero varchar(20) not null,
     bairro varchar(100) not null,
@@ -84,8 +81,7 @@ create table if not exists tb_endereco_empresa(
     cd_pais bigint not null default 1058,
     ativo boolean default true,
     data_criacao timestamp default current_timestamp,
-    data_atualizacao timestamp default current_timestamp ,
-    foreign key (empresa_id) references tb_empresas(id)
+    data_atualizacao timestamp default current_timestamp 
 );
 
 create table if not exists tb_enderecos_clientes (

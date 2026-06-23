@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"gestao/internal/repository"
-	"gestao/pkg/dbhelper"
+	"gestao/pkg/helpers"
 	"time"
 )
 
@@ -44,29 +44,35 @@ func (s *DashboardService) ObterResumo(ctx context.Context) (*ResumoDashboard, e
 
 	resumo := &ResumoDashboard{}
 	
-	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
-		totalVencido, err := s.Repo.GetTotalDebitosAtrasados(ctx, tx)
-		if err != nil {
-			return err
-		}
-		resumo.TotalVencido = totalVencido
-
-		totalSemana, err := s.Repo.GetTotalDebitosSemana(ctx, tx, inicioSemana, fimSemana)
-		if err != nil {
-			return err
-		}
-		resumo.TotalSemana = totalSemana
-
-		cats, err := s.Repo.GetDespesasPorCategoria(ctx, tx, inicioMes, fimMes)
-		if err != nil {
-			return err
-		}
-		resumo.DespesasCategoria = cats
-
-		return nil
-	})
-
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	if err := helpers.SetSchema(ctx, tx); err != nil {
+		return nil, err
+	}
+
+	totalVencido, err := s.Repo.GetTotalDebitosAtrasados(ctx, tx)
+	if err != nil {
+		return nil, err
+	}
+	resumo.TotalVencido = totalVencido
+
+	totalSemana, err := s.Repo.GetTotalDebitosSemana(ctx, tx, inicioSemana, fimSemana)
+	if err != nil {
+		return nil, err
+	}
+	resumo.TotalSemana = totalSemana
+
+	cats, err := s.Repo.GetDespesasPorCategoria(ctx, tx, inicioMes, fimMes)
+	if err != nil {
+		return nil, err
+	}
+	resumo.DespesasCategoria = cats
+
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 

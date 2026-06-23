@@ -77,6 +77,7 @@ func (c *ViewController) RenderizarClientesPage(w http.ResponseWriter, r *http.R
 		"web/template/pages/clientes.html",
 		"web/template/components/sidebar.html",
 		"web/template/components/modalCliente.html",
+		"web/template/components/modalEditarCliente.html",
 		"web/template/components/errorModal.html",
 	)
 	if err != nil {

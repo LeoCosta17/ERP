@@ -15,19 +15,19 @@ const (
 )
 
 type Cliente struct {
-	ID                int64             `json:"id,omitempty"`
-	Nome              string            `json:"nome,omitempty"`
-	Tipo              TipoPessoa        `json:"tipo,omitempty"`
-	Email             string            `json:"email,omitempty"`
-	Telefone          string            `json:"telefone,omitempty"`
-	CPF               string            `json:"cpf,omitempty"`
-	CNPJ              string            `json:"cnpj,omitempty"`
-	Contribuinte      IndContribuinte   `json:"contribuinte,omitempty"`
-	IsConsumidorFinal bool              `json:"is_consumidor_final,omitempty"`
-	IE                string            `json:"ie,omitempty"`
-	Enderecos         []EnderecoCliente `json:"endereco"`
-	CreatedAt         string            `json:"created_at,omitempty"`
-	UpdatedAt         string            `json:"updated_at,omitempty"`
+	ID                int64           `json:"id,omitempty"`
+	Nome              string          `json:"nome,omitempty"`
+	Tipo              TipoPessoa      `json:"tipo,omitempty"`
+	Email             string          `json:"email,omitempty"`
+	Telefone          string          `json:"telefone,omitempty"`
+	CPF               string          `json:"cpf,omitempty"`
+	CNPJ              string          `json:"cnpj,omitempty"`
+	Contribuinte      IndContribuinte `json:"contribuinte,omitempty"`
+	IsConsumidorFinal bool            `json:"is_consumidor_final,omitempty"`
+	IE                string          `json:"ie,omitempty"`
+	Endereco          EnderecoCliente `json:"endereco"`
+	CreatedAt         string          `json:"created_at,omitempty"`
+	UpdatedAt         string          `json:"updated_at,omitempty"`
 }
 
 type EnderecoCliente struct {

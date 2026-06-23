@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"gestao/internal/model"
 	"gestao/internal/repository"
-	"gestao/pkg/dbhelper"
+	"gestao/pkg/helpers"
 )
 
 type DebitoService struct {
@@ -18,26 +18,61 @@ func (s *DebitoService) LancarDebito(ctx context.Context, debito *model.DebitoAv
 		return err
 	}
 
-	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
-		return s.repository.Debitos.LancarDebito(ctx, tx, debito)
-	})
-	return err
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if err := helpers.SetSchema(ctx, tx); err != nil {
+		return err
+	}
+
+	err = s.repository.Debitos.LancarDebito(ctx, tx, debito)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 func (s *DebitoService) ListarDebitos(ctx context.Context, busca, vencimento, status string) ([]*model.Debito, error) {
-	var debitos []*model.Debito
-	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
-		var errTx error
-		debitos, errTx = s.repository.Debitos.ListarDebitos(ctx, tx, busca, vencimento, status)
-		return errTx
-	})
-	return debitos, err
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	if err := helpers.SetSchema(ctx, tx); err != nil {
+		return nil, err
+	}
+
+	debitos, err := s.repository.Debitos.ListarDebitos(ctx, tx, busca, vencimento, status)
+	if err != nil {
+		return nil, err
+	}
+	
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return debitos, nil
 }
 
 func (s *DebitoService) PagarDebito(ctx context.Context, id int64) error {
-	return dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
-		return s.repository.Debitos.PagarDebito(ctx, tx, id)
-	})
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if err := helpers.SetSchema(ctx, tx); err != nil {
+		return err
+	}
+
+	err = s.repository.Debitos.PagarDebito(ctx, tx, id)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 func (s *DebitoService) EditarDebito(ctx context.Context, id int64, debito *model.DebitoAvulsoCriar) error {
@@ -45,8 +80,19 @@ func (s *DebitoService) EditarDebito(ctx context.Context, id int64, debito *mode
 		return err
 	}
 
-	err := dbhelper.RunInTenantTx(ctx, s.db, func(tx *sql.Tx) error {
-		return s.repository.Debitos.EditarDebito(ctx, tx, id, debito)
-	})
-	return err
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if err := helpers.SetSchema(ctx, tx); err != nil {
+		return err
+	}
+
+	err = s.repository.Debitos.EditarDebito(ctx, tx, id, debito)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }

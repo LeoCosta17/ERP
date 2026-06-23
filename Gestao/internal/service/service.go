@@ -12,11 +12,13 @@ type Service struct {
 		CriarUsuario(ctx context.Context, usuario *model.UsuarioCriar) (*model.UsuarioBasico, error)
 	}
 	Login interface {
-		Login(ctx context.Context, usuario *model.UsuarioLogin) (uint64, string, error)
+		Login(ctx context.Context, usuario *model.UsuarioLogin) (uint64, string, string, error)
 	}
 	Clientes interface {
 		CriarCliente(ctx context.Context, c *model.Cliente) (*model.Cliente, error)
 		ListarClientes(ctx context.Context, busca string) ([]model.Cliente, error)
+		ObterClientePorID(ctx context.Context, id int64) (*model.Cliente, error)
+		AtualizarCliente(ctx context.Context, id int64, c *model.Cliente) error
 	}
 	Fornecedores interface {
 		CriarFornecedor(ctx context.Context, f *model.Fornecedor) (*model.Fornecedor, error)

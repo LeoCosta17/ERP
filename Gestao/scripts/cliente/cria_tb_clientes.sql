@@ -1,5 +1,5 @@
 create table if not exists tb_clientes(
-    id BIGSERIAL PRIMARY KEY,
+    id bigserial primary key,
     nome varchar(150) not null unique,
     tipo VARCHAR(50) not null,
     email varchar(200) unique default null,

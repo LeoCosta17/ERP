@@ -17,12 +17,17 @@ type Controller struct {
 	Login interface {
 		Login(w http.ResponseWriter, r *http.Request)
 	}
+	Empresa interface {
+		CriarEmpresa(w http.ResponseWriter, r *http.Request)
+	}
 	Usuarios interface {
 		CriarUsuario(w http.ResponseWriter, r *http.Request)
 	}
 	Clientes interface {
 		CriarCliente(w http.ResponseWriter, r *http.Request)
 		ListarClientes(w http.ResponseWriter, r *http.Request)
+		ObterCliente(w http.ResponseWriter, r *http.Request)
+		AtualizarCliente(w http.ResponseWriter, r *http.Request)
 	}
 	Fornecedores interface {
 		CriarFornecedor(w http.ResponseWriter, r *http.Request)

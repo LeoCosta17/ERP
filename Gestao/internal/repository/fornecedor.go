@@ -163,7 +163,7 @@ func (r *FornecedorRepository) ObterFornecedorPorID(ctx context.Context, tx *sql
 
 func (r *FornecedorRepository) AtualizarFornecedor(ctx context.Context, tx *sql.Tx, id int64, f *model.Fornecedor) error {
 	queryFornecedor := `
-		UPDATE tb_fornecedores 
+		UPDATE tb_fornecedores
 		SET razao_social = $1, cnpj = $2, inscricao_estadual = $3, email = $4, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $5
 	`

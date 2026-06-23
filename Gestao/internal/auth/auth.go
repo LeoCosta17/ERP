@@ -25,6 +25,7 @@ func Autenticar(next http.HandlerFunc) http.HandlerFunc {
 
 		ctx := context.WithValue(r.Context(), "usuario_id", dadosUsuarioRequesicao["usuario_id"])
 		ctx = context.WithValue(ctx, "usuario_nome", dadosUsuarioRequesicao["nome"])
+		ctx = context.WithValue(ctx, "schema", dadosUsuarioRequesicao["schema"])
 
 		r = r.WithContext(ctx)
 
