@@ -40,7 +40,6 @@ type EnderecoCliente struct {
 	Municipio       string `json:"municipio" db:"municipio"`
 	UF              string `json:"uf" db:"uf"`
 	CodigoMunicipio string `json:"codigo_municipio" db:"codigo_municipio"`
-	IsPrincipal     bool   `json:"is_principal" db:"is_principal"`
 	CreatedAt       string `json:"created_at" db:"created_at"`
 }
 

@@ -18,8 +18,8 @@ func (r *LoginRepository) Login(ctx context.Context, email string) (uint64, stri
 	err := r.db.QueryRowContext(ctx, `
 		select u.id, u.nome, u.senha, e.schema
 		from tb_usuarios_gestao u
-		join tb_empresas e on e.id = u.id_empresa
-		where u.email = $1;
+		join tb_empresas_gestao e on e.id = u.id_empresa
+		where u.email = $1 and e.ativo = true;
 	`, email).Scan(&id, &nome, &senhaDB, &schema)
 
 	if err != nil {

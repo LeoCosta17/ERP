@@ -20,7 +20,7 @@ func main() {
 	}
 
 	database := &db.BancoDados{
-		ConnectionString: config.GetString("DB_CONNECTION_STRING", "user=admin password=12345 dbname=ecommerce host=localhost port=5432 sslmode=disable"),
+		ConnectionString: config.GetString("DB_CONNECTION_STRING", "user=admin password=12345 dbname=erp host=localhost port=5432 sslmode=disable"),
 		Driver:           config.GetString("DB_DRIVER", "postgres"),
 		MaxOpenConns:     config.GetInt("DB_MAX_OPEN_CONNS", 25),
 		MaxIdleConns:     config.GetInt("DB_MAX_IDLE_CONNS", 25),
@@ -34,12 +34,13 @@ func main() {
 	}
 	defer dbConn.Close()
 
-	fmt.Println("Sincronizando tabelas com o banco de dados...")
-	if err := db.IniciarTabelas(dbConn); err != nil {
-		fmt.Printf("Erro crítico ao sincronizar banco de dados: %v\n", err)
-		return
-	}
-
+	/*
+		fmt.Println("Sincronizando tabelas com o banco de dados...")
+		if err := db.IniciarTabelas(dbConn); err != nil {
+			fmt.Printf("Erro crítico ao sincronizar banco de dados: %v\n", err)
+			return
+		}
+	*/
 	repositorio := repository.NewRepository(dbConn)
 	service := service.NewService(repositorio, dbConn)
 	controller := controller.NewController(service)

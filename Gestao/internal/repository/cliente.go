@@ -43,14 +43,14 @@ func (r *ClienteRepository) CriarCliente(ctx context.Context, tx *sql.Tx, c *mod
 
 	var endID int64
 	query = `
-			insert into tb_enderecos_clientes(id_cliente, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal)
-			values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+			insert into tb_enderecos_clientes(id_cliente, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio)
+			values ($1, $2, $3, $4, $5, $6, $7, $8)
 			returning id, created_at;
 		`
 	err = tx.QueryRowContext(
 		ctx, query, c.ID, c.Endereco.CEP, c.Endereco.Logradouro,
 		c.Endereco.Numero, c.Endereco.Bairro, c.Endereco.Municipio, c.Endereco.UF,
-		c.Endereco.CodigoMunicipio, c.Endereco.IsPrincipal).Scan(
+		c.Endereco.CodigoMunicipio).Scan(
 		&endID, &c.Endereco.CreatedAt,
 	)
 	if err != nil {
@@ -142,14 +142,14 @@ func (r *ClienteRepository) ObterClientePorID(ctx context.Context, tx *sql.Tx, i
 	}
 
 	// Buscar endereços
-	queryEnderecos := `
-		SELECT id, id_cliente, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal, created_at
+	queryEndereco := `
+		SELECT id, id_cliente, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, created_at
 		FROM tb_enderecos_clientes
 		WHERE id_cliente = $1
 	`
-	err = tx.QueryRowContext(ctx, queryEnderecos, id).Scan(
+	err = tx.QueryRowContext(ctx, queryEndereco, id).Scan(
 		&c.Endereco.ID, &c.Endereco.IDCliente, &c.Endereco.CEP, &c.Endereco.Logradouro, &c.Endereco.Numero, &c.Endereco.Bairro,
-		&c.Endereco.Municipio, &c.Endereco.UF, &c.Endereco.CodigoMunicipio, &c.Endereco.IsPrincipal, &c.CreatedAt,
+		&c.Endereco.Municipio, &c.Endereco.UF, &c.Endereco.CodigoMunicipio, &c.CreatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -158,32 +158,28 @@ func (r *ClienteRepository) ObterClientePorID(ctx context.Context, tx *sql.Tx, i
 	return c, nil
 }
 
-func (r *ClienteRepository) AtualizarCliente(ctx context.Context, tx *sql.Tx, id int64, c *model.Cliente) error {
+func (r *ClienteRepository) AtualizarCliente(ctx context.Context, tx *sql.Tx, ID_Cliente int64, c *model.Cliente) error {
+	// query para atualizar os dados do cliente
 	query := `
 		UPDATE tb_clientes
 		SET nome = $1, tipo = $2, email = $3, telefone = $4, cpf = $5, cnpj = $6, contribuinte = $7, is_consumidor_final = $8, ie = $9, updated_at = CURRENT_TIMESTAMP
 		WHERE id = $10
 	`
 	_, err := tx.ExecContext(ctx, query, c.Nome, c.Tipo, nullIfEmpty(c.Email), nullIfEmpty(c.Telefone),
-		nullIfEmpty(c.CPF), nullIfEmpty(c.CNPJ), nullIfZeroInt(c.Contribuinte), c.IsConsumidorFinal, nullIfEmpty(c.IE), id)
+		nullIfEmpty(c.CPF), nullIfEmpty(c.CNPJ), nullIfZeroInt(c.Contribuinte), c.IsConsumidorFinal, nullIfEmpty(c.IE), ID_Cliente)
 	if err != nil {
 		return err
 	}
 
-	// Deleta endereços atuais
-	_, err = tx.ExecContext(ctx, "DELETE FROM tb_enderecos_clientes WHERE id_cliente = $1", id)
-	if err != nil {
-		return err
-	}
-
-	// Insere novos endereços
-	queryEndereco := `
-			insert into tb_enderecos_clientes(id_cliente, cep, logradouro, numero, bairro, municipio, uf, codigo_municipio, is_principal)
-			values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-		`
-	_, err = tx.ExecContext(ctx, queryEndereco,
-		id, c.Endereco.CEP, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Bairro,
-		c.Endereco.Municipio, c.Endereco.UF, c.Endereco.CodigoMunicipio, c.Endereco.IsPrincipal,
+	// query para atualizar o endereço do cliente
+	query = `
+		UPDATE tb_enderecos_clientes
+		SET cep = $1, logradouro = $2, numero = $3, bairro = $4, municipio = $5, uf = $6, codigo_municipio = $7, updated_at = CURRENT_TIMESTAMP
+		WHERE id_cliente = $8
+	`
+	_, err = tx.ExecContext(ctx, query,
+		c.Endereco.CEP, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Bairro,
+		c.Endereco.Municipio, c.Endereco.UF, c.Endereco.CodigoMunicipio, ID_Cliente,
 	)
 	if err != nil {
 		return err

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"gestao/internal/model"
 	"gestao/internal/service"
 	"gestao/pkg/requisicao"
@@ -24,6 +25,7 @@ func (c *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 
 	id, nome, schema, err := c.service.Login.Login(r.Context(), &usuarioRequest)
 	if err != nil {
+		fmt.Printf("ERRO REAL DURANTE O LOGIN: %v\n", err) // Print para debug
 		resposta.Padrao(w, http.StatusUnauthorized, "dados login inválidos")
 		return
 	}
