@@ -1,5 +1,5 @@
 import { getToken } from "../utils/auth.js";
-import { showError } from "../fornecedores/listarFornecedores.js";
+import { showError } from '/static/js/utils/showError.js'; 
 
 export async function carregarClientes(busca = "") {
   const tbody = document.getElementById("tabela_clientes_body");
@@ -34,7 +34,7 @@ export async function carregarClientes(busca = "") {
     const dados = await res.json();
     renderTabela(dados);
   } catch (err) {
-    console.error(err);
+    showErrror(err.message || "Erro de comunicação.");
     tbody.innerHTML = `<tr><td colspan="7" class="text-danger py-5 text-center">Erro de comunicação.</td></tr>`;
   }
 }

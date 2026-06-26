@@ -116,7 +116,6 @@ func (r *DebitoRepository) PagarDebito(ctx context.Context, tx *sql.Tx, id int64
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
 
 	var status string
 	if stmt.Next() {
@@ -124,6 +123,7 @@ func (r *DebitoRepository) PagarDebito(ctx context.Context, tx *sql.Tx, id int64
 			return err
 		}
 	}
+	stmt.Close()
 
 	if status != "PENDENTE" {
 		return DEBITO_QUITADO

@@ -1,5 +1,6 @@
 import { getToken } from "../utils/auth.js";
-import { carregarClientes, showError } from "./listarClientes.js";
+import { carregarClientes} from "./listarClientes.js";
+import { showError } from '/static/js/utils/showError.js';
 
 export function setupEditarCliente() {
   const formEditar = document.getElementById('formEditarCliente');

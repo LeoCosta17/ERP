@@ -24,7 +24,7 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 		log.Fatal(err)
 	}
 	filesDir := http.Dir(filepath.Join(workDir, "web", "static"))
-	r.Handle("/static/*", http.StripPrefix("/static", http.FileServer(filesDir)))
+	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(filesDir)))
 
 	// rotas renderizar páginas
 	r.Get("/", c.View.RenderizarLoginPage)

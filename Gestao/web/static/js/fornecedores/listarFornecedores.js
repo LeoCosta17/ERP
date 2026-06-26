@@ -1,16 +1,5 @@
 import { getToken } from '../utils/auth.js';
-
-function showError(message) {
-    const modalBody = document.getElementById('errorModalBody');
-    if (modalBody) {
-        modalBody.textContent = message;
-        const errorModalElement = document.getElementById('errorModal');
-        const errorModal = bootstrap.Modal.getOrCreateInstance(errorModalElement);
-        errorModal.show();
-    } else {
-        alert(message);
-    }
-}
+import { showError } from '/static/js/utils/showError.js';
 
 export async function carregarFornecedores(busca = "") {
     const tbody = document.getElementById('tabela_fornecedores_body');

@@ -1,6 +1,6 @@
-import { getToken } from '../utils/auth.js';
-import { showError } from '../fornecedores/listarFornecedores.js';
-import { carregarClientes } from './listarClientes.js';
+import { getToken } from '/static/js/utils/auth.js';
+import { showError } from '/static/js/utils/showError.js'; 
+import { carregarClientes } from '/static/js/clientes/listarClientes.js'; // Garanta que a p
 
 export function setupCriarCliente() {
     const formNovo = document.getElementById('formNovoCliente');
@@ -18,7 +18,10 @@ export function setupCriarCliente() {
         const telefone = document.getElementById('cliente_telefone').value;
 
         const payload = {
-            nome, tipo, email, telefone
+            nome,
+            tipo,
+            email,
+            telefone
         };
 
         if (tipo === 'PF') {

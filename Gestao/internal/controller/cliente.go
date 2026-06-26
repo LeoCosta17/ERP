@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"gestao/internal/model"
 	"gestao/internal/service"
 	"gestao/pkg/requisicao"
@@ -17,11 +18,13 @@ func (c *ClienteController) CriarCliente(w http.ResponseWriter, r *http.Request)
 	var cliente model.Cliente
 
 	if err := requisicao.ProcessarRequisicao(w, r, &cliente); err != nil {
+		fmt.Println("Erro ao processar requisição:", err)
 		return
 	}
 
 	clienteCriado, err := c.service.Clientes.CriarCliente(r.Context(), &cliente)
 	if err != nil {
+		fmt.Println("Erro ao criar cliente:", err)
 		resposta.Padrao(w, http.StatusBadRequest, map[string]string{"erro": err.Error()})
 		return
 	}
@@ -77,6 +80,7 @@ func (c *ClienteController) AtualizarCliente(w http.ResponseWriter, r *http.Requ
 
 	var cliente model.Cliente
 	if err := requisicao.ProcessarRequisicao(w, r, &cliente); err != nil {
+		fmt.Println("Erro ao processar requisição:", err)
 		return
 	}
 

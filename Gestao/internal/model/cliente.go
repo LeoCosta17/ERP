@@ -58,9 +58,6 @@ func (c *Cliente) Validar() error {
 	if c.Tipo == PessoaJuridica && c.CNPJ == "" {
 		erros = append(erros, errors.New("CNPJ obrigatório"))
 	}
-	if c.Telefone == "" {
-		erros = append(erros, errors.New("telefone obrigatório"))
-	}
 	if len(erros) != 0 {
 		return errors.Join(erros...)
 	}
