@@ -1,5 +1,34 @@
 import { getToken } from '../utils/auth.js';
-import { carregarFornecedores, showError } from './listarFornecedores.js';
+import { carregarFornecedores} from './listarFornecedores.js';
+import { showError } from '../utils/alerts.js';
+import { fecharModal } from '../utils/fecharModal.js';
+
+async function criarFornecedorAPI(dados){
+
+    const token = getToken();
+    const res = await fetch('/api/fornecedores',{
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(dados)
+    });
+    if(!res.ok){
+        const data = await res.json();
+        throw new Error(data.erro || "Erro ao cadastrar fornecedor.");
+    }
+    return await res.json();
+}
+
+function recarregarDados(){
+    const tbody = document.getElementById('tabela_fornecedores_body');
+    if(tbody){
+        carregarFornecedores();
+    }else{
+        window.location.reload();
+    }
+}
 
 export function setupCriarFornecedor() {
     // 1. Busca o formulário na tela. Se não existir, interrompe a execução para evitar erros.
@@ -7,55 +36,26 @@ export function setupCriarFornecedor() {
     if (!formNovo) return;
 
     // 2. Intercepta o evento de envio (submit) do formulário
-    formNovo.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Impede o comportamento padrão de recarregar a página
+    formNovo.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Evita o envio padrão do formulário
+        
+        // 3. Coleta os dados do formulário
+        const formData = new FormData(formNovo);
+        const dadosFornecedor = {
+            fornecedor_razao_social: formData.get('fornecedor_razao_social'),
+            fornecedor_cnpj: formData.get('fornecedor_cnpj'),
+            fornecedor_email: formData.get('fornecedor_email')
+        };
 
-        // 3. Extrai o token de segurança e os dados preenchidos pelo usuário
-        const token = getToken();
-        const razao_social = document.getElementById('fornecedor_razao_social').value;
-        const cnpj = document.getElementById('fornecedor_cnpj').value;
-        const email = document.getElementById('fornecedor_email').value;
-
-        try {
-            // 4. Envia os dados para o backend via requisição assíncrona (AJAX / Fetch API)
-            const res = await fetch('/api/fornecedores', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}` // Token de autenticação
-                },
-                body: JSON.stringify({ razao_social, cnpj, email })
-            });
-
-            // 5. Trata as respostas de erro da API (ex: campos inválidos ou duplicados)
-            if (!res.ok) {
-                const data = await res.json();
-                showError(data.erro || "Erro ao cadastrar fornecedor.");
-                return;
-            }
-
-            // 6. Sucesso: Busca e oculta o modal do Bootstrap atrelado ao formulário
-            const modalEl = document.getElementById('modalFornecedor');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-
-            // 7. Limpa os campos do formulário para preparar o próximo uso
-            formNovo.reset();
-            
-            // 8. Atualiza a tela de forma inteligente:
-            // Verifica se a tabela de listagem está na página. Se sim, apenas recarrega os dados dela.
-            // Se não, recarrega a página inteira.
-            const tbody = document.getElementById('tabela_fornecedores_body');
-            if (tbody) {
-                carregarFornecedores(); // recarrega a lista sem atualizar a página
-            } else {
-                window.location.reload();
-            }
-
-        } catch (err) {
-            // 9. Captura falhas inesperadas de rede ou quebras de script
-            console.error(err);
-            showError("Erro interno ao comunicar com o servidor.");
+        try{
+            // 4. Chama a função que faz a requisição para criar o fornecedor
+            await criarFornecedorAPI(dadosFornecedor);
+            // 5. Fecha o modal e recarrega os dados da tabela
+            fecharModal('modalNovoFornecedor');
+            formNovo.reset(); // Limpa o formulário após o envio
+            recarregarDados();
+        }catch(err){        
+            showError(err.message); 
         }
-    });
+    })
 }
