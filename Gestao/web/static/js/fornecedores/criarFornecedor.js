@@ -42,9 +42,9 @@ export function setupCriarFornecedor() {
         // 3. Coleta os dados do formulário
         const formData = new FormData(formNovo);
         const dadosFornecedor = {
-            fornecedor_razao_social: formData.get('fornecedor_razao_social'),
-            fornecedor_cnpj: formData.get('fornecedor_cnpj'),
-            fornecedor_email: formData.get('fornecedor_email')
+            razao_social: formData.get('fornecedor_razao_social'),
+            cnpj: formData.get('fornecedor_cnpj'),
+            email: formData.get('fornecedor_email')
         };
 
         console.log('Dados do fornecedor a serem enviados:', dadosFornecedor); // Log para depuração
