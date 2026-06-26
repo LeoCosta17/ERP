@@ -9,7 +9,7 @@ services:
       # ATENÇÃO: Substitua pelos seus valores ou use um arquivo .env
       POSTGRES_DB: erp
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 12345
+      POSTGRES_PASSWORD: stfXJxYNAFleLsvWqRUyzsMhGosduXkk
     volumes:
       # Garante que os dados do banco de dados persistam ao reiniciar o contêiner
       - postgres_data:/var/lib/postgresql/data
