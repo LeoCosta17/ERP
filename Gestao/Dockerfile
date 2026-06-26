@@ -1,6 +1,6 @@
 # Stage 1: Build the Go binary
 # Usamos uma imagem oficial do Go com Alpine Linux, que é leve.
-FROM golang:1.22-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 # Instala git, necessário para o 'go mod download' buscar dependências de repositórios.
 RUN apk add --no-cache git
