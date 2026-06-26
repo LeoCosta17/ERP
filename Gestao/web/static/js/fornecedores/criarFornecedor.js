@@ -47,6 +47,8 @@ export function setupCriarFornecedor() {
             fornecedor_email: formData.get('fornecedor_email')
         };
 
+        console.log('Dados do fornecedor a serem enviados:', dadosFornecedor); // Log para depuração
+
         try{
             // 4. Chama a função que faz a requisição para criar o fornecedor
             await criarFornecedorAPI(dadosFornecedor);
