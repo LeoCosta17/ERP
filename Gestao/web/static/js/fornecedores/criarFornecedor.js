@@ -1,6 +1,6 @@
 import { getToken } from '/static/js/utils/auth.js';
 import { carregarFornecedores} from '/static/js/fornecedores/listarFornecedores.js';
-import { showError } from '/static/js/utils/alerts.js';
+import { showError } from '/static/js/utils/showError.js';
 import { fecharModal } from '/static/js/utils/fecharModal.js';
 
 async function criarFornecedorAPI(dados){
