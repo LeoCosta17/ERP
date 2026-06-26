@@ -7,9 +7,9 @@ services:
     container_name: erp_postgres
     environment:
       # ATENÇÃO: Substitua pelos seus valores ou use um arquivo .env
-      POSTGRES_DB: gestao_db
-      POSTGRES_USER: gestao_user
-      POSTGRES_PASSWORD: sua_senha_super_segura
+      POSTGRES_DB: erp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
     volumes:
       # Garante que os dados do banco de dados persistam ao reiniciar o contêiner
       - postgres_data:/var/lib/postgresql/data
