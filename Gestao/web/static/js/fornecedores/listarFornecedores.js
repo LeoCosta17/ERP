@@ -18,7 +18,7 @@ async function carregarFornecedoresAPI(busca = ""){
         }
     })
 
-    return await validarRespostaRequisicao(res);
+    return await validaRespostaRequisicao(res);
 }
 
 export async function carregarFornecedores(busca = "") {
