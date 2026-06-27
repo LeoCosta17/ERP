@@ -1,6 +1,6 @@
 import { getToken } from '/static/js/utils/auth.js';
 import { showError } from '/static/js/utils/showError.js';
-import { validarRespostaRequisicao } from '/static/js/utils/resposta.js';
+import { validaRespostaRequisicao } from '/static/js/utils/resposta.js';
 
 async function carregarFornecedoresAPI(busca = ""){
 
