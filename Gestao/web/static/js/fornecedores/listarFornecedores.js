@@ -29,7 +29,7 @@ export async function carregarFornecedores(busca = "") {
     
     try {
         
-        dados = await carregarFornecedoresAPI(busca);
+        const dados = await carregarFornecedoresAPI(busca);
         renderTabela(dados);
 
     } catch (err) {

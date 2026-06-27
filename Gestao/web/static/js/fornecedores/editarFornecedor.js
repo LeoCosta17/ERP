@@ -1,5 +1,6 @@
 import { getToken } from '../utils/auth.js';
-import { carregarFornecedores, showError } from './listarFornecedores.js';
+import { carregarFornecedores } from './listarFornecedores.js';
+import { showError } from '../utils/showError.js';
 
 export function setupEditarFornecedor() {
     window.abrirModalEditarFornecedor = async function(id) {
