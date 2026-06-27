@@ -1,11 +1,30 @@
-import { getToken } from '../utils/auth.js';
+import { getToken } from '/static/js/utils/auth.js';
 import { showError } from '/static/js/utils/showError.js';
+import { validarRespostaRequisicao } from '/static/js/utils/resposta.js';
+
+async function carregarFornecedoresAPI(busca = ""){
+
+    const token = getToken();
+
+    let url = '/api/fornecedores';
+    if(busca){
+        url += `?busca=${encodeURIComponent(busca)}`;
+    }
+
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+
+    return await validarRespostaRequisicao(res);
+}
 
 export async function carregarFornecedores(busca = "") {
     const tbody = document.getElementById('tabela_fornecedores_body');
     if (!tbody) return;
     
-    const token = getToken();
     tbody.innerHTML = `<tr><td colspan="5" class="text-muted py-5 text-center">Carregando...</td></tr>`;
     
     try {
@@ -64,5 +83,3 @@ function renderTabela(fornecedores) {
         tbody.appendChild(tr);
     });
 }
-
-export { showError };

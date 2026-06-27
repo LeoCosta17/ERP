@@ -53,8 +53,8 @@ export function setupCriarFornecedor() {
             // 4. Chama a função que faz a requisição para criar o fornecedor
             await criarFornecedorAPI(dadosFornecedor);
             // 5. Fecha o modal e recarrega os dados da tabela
-            fecharModal('modalNovoFornecedor');
             formNovo.reset(); // Limpa o formulário após o envio
+            fecharModal('modalNovoFornecedor');
             recarregarDados();
         }catch(err){        
             showError(err.message); 
