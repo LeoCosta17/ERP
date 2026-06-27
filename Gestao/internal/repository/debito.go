@@ -154,7 +154,6 @@ func (r *DebitoRepository) EditarDebito(ctx context.Context, tx *sql.Tx, id int6
 	if err != nil {
 		return err
 	}
-	defer stmt.Close()
 
 	var status string
 	if stmt.Next() {
@@ -162,6 +161,7 @@ func (r *DebitoRepository) EditarDebito(ctx context.Context, tx *sql.Tx, id int6
 			return err
 		}
 	}
+	stmt.Close()
 
 	if status != "PENDENTE" {
 		return DEBITO_QUITADO
