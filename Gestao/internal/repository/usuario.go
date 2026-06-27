@@ -28,3 +28,13 @@ func (r *UsuarioRepository) CriarUsuario(ctx context.Context, tx *sql.Tx, usuari
 		Email: usuario.Email,
 	}, nil
 }
+
+func (r *UsuarioRepository) BuscarUsuarioPorID(ctx context.Context, usuarioID int) (*model.Usuario, error) {
+	var usuario model.Usuario
+	err := r.db.QueryRowContext(ctx, `select id, nome, cpf, email, telefone, senha from tb_usuarios_gestao where id = $1`).Scan(
+		&usuario.ID, &usuario.Nome, &usuario.CPF, &usuario.Email, &usuario.Telefone, &usuario.Senha)
+	if err != nil {
+		return nil, err
+	}
+	return &usuario, nil
+}

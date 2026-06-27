@@ -12,6 +12,7 @@ type Repository struct {
 	}
 	Usuarios interface {
 		CriarUsuario(ctx context.Context, tx *sql.Tx, usuario *model.UsuarioCriar) (*model.UsuarioBasico, error)
+		BuscarUsuarioPorID(ctx context.Context, usuarioID int) (*model.Usuario, error)
 	}
 	Clientes interface {
 		CriarCliente(ctx context.Context, tx *sql.Tx, c *model.Cliente) (*model.Cliente, error)

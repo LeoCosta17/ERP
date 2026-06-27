@@ -39,3 +39,8 @@ func (s *UsuarioService) CriarUsuario(ctx context.Context, usuario *model.Usuari
 
 	return usuarioCriado, nil
 }
+
+func (s *UsuarioService) BuscarUsuarioPorID(ctx context.Context, usuarioID int) (*model.Usuario, error) {
+
+	return s.repository.Usuarios.BuscarUsuarioPorID(ctx, usuarioID)
+}

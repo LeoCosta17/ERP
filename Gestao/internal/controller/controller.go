@@ -22,6 +22,8 @@ type Controller struct {
 	}
 	Usuarios interface {
 		CriarUsuario(w http.ResponseWriter, r *http.Request)
+		BuscarUsuarioPorID(w http.ResponseWriter, r *http.Request)
+		EditarUsuario(w http.ResponseWriter, r *http.Request)
 	}
 	Clientes interface {
 		CriarCliente(w http.ResponseWriter, r *http.Request)
