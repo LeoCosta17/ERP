@@ -133,3 +133,21 @@ func (c *ViewController) RenderizarCategoriasPage(w http.ResponseWriter, r *http
 		return
 	}
 }
+
+func (c *ViewController) RenderizarConfiguracaoUsuarioPage(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(
+		"web/template/pages/configuracao_usuario.html",
+		"web/template/components/sidebar.html",
+	)
+	if err != nil {
+		fmt.Printf("Erro ao renderizar página de configuração do usuário: %v\n", err)
+		http.Error(w, "Erro interno ao renderizar página", http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(w, nil); err != nil {
+		fmt.Printf("Erro ao executar template de configuração do usuário: %v\n", err)
+		http.Error(w, "Erro interno", http.StatusInternalServerError)
+		return
+	}
+}
