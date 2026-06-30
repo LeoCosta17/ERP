@@ -48,7 +48,7 @@ func (c *UsuarioController) BuscarUsuarioPorID(w http.ResponseWriter, r *http.Re
 
 	usuario, err := c.service.Usuarios.BuscarUsuarioPorID(r.Context(), int(usuarioID))
 	if err != nil {
-		resposta.Padrao(w, http.StatusNotFound, map[string]string{"erro": "Usuário não encontrado"})
+		resposta.Padrao(w, http.StatusNotFound, map[string]string{"erro": "erro ao buscar usuário: " + err.Error()})
 		return
 	}
 	resposta.Padrao(w, http.StatusOK, usuario)
