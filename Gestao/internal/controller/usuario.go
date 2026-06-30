@@ -6,7 +6,6 @@ import (
 	"gestao/pkg/requisicao"
 	"gestao/pkg/resposta"
 	"net/http"
-	"strconv"
 )
 
 type UsuarioController struct {
@@ -32,13 +31,22 @@ func (c *UsuarioController) CriarUsuario(w http.ResponseWriter, r *http.Request)
 
 func (c *UsuarioController) BuscarUsuarioPorID(w http.ResponseWriter, r *http.Request) {
 
-	usuarioID, err := strconv.Atoi(r.URL.Query().Get("id"))
-	if err != nil {
-		resposta.Padrao(w, http.StatusBadRequest, map[string]string{"erro": "ID inválido"})
+	// O ID do usuário vem do token JWT, que é validado pelo middleware de autenticação.
+	// O pacote JWT decodifica números JSON como float64, então tratamos esse tipo.
+	usuarioIDClaim := r.Context().Value("usuario_id")
+	if usuarioIDClaim == nil {
+		resposta.Padrao(w, http.StatusUnauthorized, map[string]string{"erro": "ID do usuário não encontrado no token"})
 		return
 	}
 
-	usuario, err := c.service.Usuarios.BuscarUsuarioPorID(r.Context(), usuarioID)
+	// Convertemos o ID de float64 para int de forma segura.
+	usuarioID, ok := usuarioIDClaim.(float64)
+	if !ok {
+		resposta.Padrao(w, http.StatusInternalServerError, map[string]string{"erro": "Formato de ID do usuário inválido no token"})
+		return
+	}
+
+	usuario, err := c.service.Usuarios.BuscarUsuarioPorID(r.Context(), int(usuarioID))
 	if err != nil {
 		resposta.Padrao(w, http.StatusNotFound, map[string]string{"erro": "Usuário não encontrado"})
 		return
@@ -47,3 +55,5 @@ func (c *UsuarioController) BuscarUsuarioPorID(w http.ResponseWriter, r *http.Re
 }
 
 func (c *UsuarioController) EditarUsuario(w http.ResponseWriter, r *http.Request) {}
+
+func (c *UsuarioController) AlterarSenha(w http.ResponseWriter, r *http.Request) {}

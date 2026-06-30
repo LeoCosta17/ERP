@@ -29,6 +29,7 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 	// rotas renderizar páginas
 	r.Get("/", c.View.RenderizarLoginPage)
 	r.Get("/dashboard", c.View.RenderizarDashboardPage)
+	r.Get("/configuracao-usuario", c.View.RenderizarConfiguracaoUsuarioPage)
 	r.Get("/debitos", c.View.RenderizarDebitosPage)
 	r.Get("/clientes", c.View.RenderizarClientesPage)
 	r.Get("/fornecedores", c.View.RenderizarFornecedoresPage)
@@ -38,7 +39,7 @@ func CarregarRotas(c *controller.Controller) *chi.Mux {
 	r.Route("/api", func(r chi.Router) {
 		r.Post("/login", c.Login.Login)
 		r.Post("/usuarios", c.Usuarios.CriarUsuario)
-
+		r.Get("/usuario", auth.Autenticar(c.Usuarios.BuscarUsuarioPorID))
 		r.Get("/fornecedores", auth.Autenticar(c.Fornecedores.ListarFornecedores))
 		r.Post("/fornecedores", auth.Autenticar(c.Fornecedores.CriarFornecedor))
 		r.Get("/fornecedores/{id}", auth.Autenticar(c.Fornecedores.ObterFornecedor))

@@ -13,6 +13,7 @@ type Controller struct {
 		RenderizarClientesPage(w http.ResponseWriter, r *http.Request)
 		RenderizarFornecedoresPage(w http.ResponseWriter, r *http.Request)
 		RenderizarCategoriasPage(w http.ResponseWriter, r *http.Request)
+		RenderizarConfiguracaoUsuarioPage(w http.ResponseWriter, r *http.Request)
 	}
 	Login interface {
 		Login(w http.ResponseWriter, r *http.Request)
@@ -24,6 +25,7 @@ type Controller struct {
 		CriarUsuario(w http.ResponseWriter, r *http.Request)
 		BuscarUsuarioPorID(w http.ResponseWriter, r *http.Request)
 		EditarUsuario(w http.ResponseWriter, r *http.Request)
+		AlterarSenha(w http.ResponseWriter, r *http.Request)
 	}
 	Clientes interface {
 		CriarCliente(w http.ResponseWriter, r *http.Request)
