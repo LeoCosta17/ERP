@@ -27,7 +27,7 @@ export async function carregarDadosUsuario() {
     const telefoneInput = document.getElementById('telefone');
 
     try {
-        const dadosUsuario = await carregarMeusDadosAPI();
+        const dadosUsuario = await carregarDadosUsuarioAPI();
 
         if (dadosUsuario) {
             nomeInput.value = dadosUsuario.nome || '';
