@@ -36,6 +36,13 @@ export async function carregarDebitos() {
 
         const dados = await res.json();
         state.debitosCarregados = dados;
+
+        const totalDebitos = dados.reduce((total, d) => total + d.valor, 0);
+        const totalDebitosElement = document.getElementById('total_debitos');
+        if (totalDebitosElement) {
+            totalDebitosElement.textContent = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalDebitos);
+        }
+
         renderTabelaDebitos(dados);
     } catch (err) {
         console.error(err);
