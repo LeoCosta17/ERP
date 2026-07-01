@@ -6,5 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!checkAuth()) return;
 
     carregarDadosUsuario();
-    alterarSenha()
+    const formAlterarSenha = document.getElementById('formAlterarSenha');
+    if (formAlterarSenha) {
+        formAlterarSenha.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alterarSenha();
+        });
+    }
 });
