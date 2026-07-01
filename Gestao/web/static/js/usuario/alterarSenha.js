@@ -5,7 +5,7 @@ import { validaRespostaRequisicao } from '/static/js/utils/resposta.js';
 async function alterarSenhaAPI(senhaAtual, novaSenha, senhaConfirmacao) {
     const token = getToken();
     const res = await fetch(`/api/usuario/alterar-senha`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
