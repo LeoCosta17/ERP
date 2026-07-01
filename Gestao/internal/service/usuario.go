@@ -56,7 +56,7 @@ func (s *UsuarioService) AlterarSenha(ctx context.Context, usuarioID int64, senh
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(*senhaArmazenada), []byte(senhaAtual)); err != nil {
-		return err
+		return errors.New("Senha atual recebida: " + senhaAtual + " não corresponde à senha armazenada")
 	}
 
 	if senhaNova != senhaNovaConfirmacao {
