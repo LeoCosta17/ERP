@@ -68,6 +68,12 @@ func (s *UsuarioService) AlterarSenha(ctx context.Context, usuarioID int64, senh
 		return err
 	}
 
+	hash, err := bcrypt.GenerateFromPassword([]byte(senhaNova), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	senhaNova = string(hash)
+
 	if err := s.repository.Usuarios.AtualizarSenhaUsuario(ctx, tx, usuarioID, senhaNova); err != nil {
 		tx.Rollback()
 		return err
