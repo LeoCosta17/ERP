@@ -11,9 +11,9 @@ async function alterarSenhaAPI(senhaAtual, novaSenha, senhaConfirmacao) {
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-            senhaAtual: senha_atual,
-            novaSenha: nova_senha,
-            senhaConfirmacao: senha_confirmacao
+            senha_atual: senhaAtual,
+            nova_senha: novaSenha,
+            senha_confirmacao: senhaConfirmacao
         })
     });
 
