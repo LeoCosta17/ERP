@@ -23,21 +23,28 @@ async function alterarSenhaAPI(senhaAtual, novaSenha, senhaConfirmacao) {
 
 export async function alterarSenha(){
 
-    const senhaAtualInput = document.getElementById('senha_atual');
-    const novaSenhaInput = document.getElementById('nova_senha');
-    const senhaConfirmacaoInput = document.getElementById('senha_confirmacao');
+    const formAlterarSenha = document.getElementById('formAlterarSenha');
+    if(!formAlterarSenha) return;
 
-    const senhaAtual = senhaAtualInput.value;
-    const novaSenha = novaSenhaInput.value;
-    const senhaConfirmacao = senhaConfirmacaoInput.value;
+    formAlterarSenha.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-    try{
-        const res = await alterarSenhaAPI(senhaAtual, novaSenha, senhaConfirmacao);
-        senhaAtualInput.value = '';
-        novaSenhaInput.value = '';
-        senhaConfirmacaoInput.value = '';
-        alert("Senha alterada com sucesso!");
-    } catch(err){
-        showError(err.message || "Erro ao alterar senha.");
-    }
+        const senhaAtualInput = document.getElementById('senha_atual');
+        const novaSenhaInput = document.getElementById('nova_senha');
+        const senhaConfirmacaoInput = document.getElementById('senha_confirmacao');
+
+        const senhaAtual = senhaAtualInput.value;
+        const novaSenha = novaSenhaInput.value;
+        const senhaConfirmacao = senhaConfirmacaoInput.value;
+
+        try{
+            const res = await alterarSenhaAPI(senhaAtual, novaSenha, senhaConfirmacao);
+            senhaAtualInput.value = '';
+            novaSenhaInput.value = '';
+            senhaConfirmacaoInput.value = '';
+            alert("Senha alterada com sucesso!");
+        } catch(err){
+            showError(err.message || "Erro ao alterar senha.");
+        }
+    });
 }
