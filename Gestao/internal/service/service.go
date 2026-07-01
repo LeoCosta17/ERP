@@ -11,6 +11,7 @@ type Service struct {
 	Usuarios interface {
 		CriarUsuario(ctx context.Context, usuario *model.UsuarioCriar) (*model.UsuarioBasico, error)
 		BuscarUsuarioPorID(ctx context.Context, usuarioID int) (*model.Usuario, error)
+		AlterarSenha(ctx context.Context, usuarioID int64, senhaAtual, senhaNova, senhaNovaConfirmacao string) error
 	}
 	Login interface {
 		Login(ctx context.Context, usuario *model.UsuarioLogin) (uint64, string, string, error)

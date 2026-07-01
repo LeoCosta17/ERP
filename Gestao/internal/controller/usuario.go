@@ -56,4 +56,29 @@ func (c *UsuarioController) BuscarUsuarioPorID(w http.ResponseWriter, r *http.Re
 
 func (c *UsuarioController) EditarUsuario(w http.ResponseWriter, r *http.Request) {}
 
-func (c *UsuarioController) AlterarSenha(w http.ResponseWriter, r *http.Request) {}
+func (c *UsuarioController) AlterarSenha(w http.ResponseWriter, r *http.Request) {
+
+	type payload struct {
+		SenhaAtual       string `json:"senha_atual"`
+		NovaSenha        string `json:"nova_senha"`
+		SenhaConfirmacao string `json:"senha_confirmacao"`
+	}
+
+	var p payload
+
+	if err := requisicao.ProcessarRequisicao(w, r, &p); err != nil {
+		return
+	}
+
+	usuarioIDClaim := r.Context().Value("usuario_id")
+	if usuarioIDClaim == nil {
+		resposta.Padrao(w, http.StatusUnauthorized, map[string]string{"erro": "ID do usuário não encontrado no token"})
+		return
+	}
+
+	if err := c.service.Usuarios.AlterarSenha(r.Context(), int64(usuarioIDClaim.(float64)), p.SenhaAtual, p.NovaSenha, p.SenhaConfirmacao); err != nil {
+		resposta.Padrao(w, http.StatusBadRequest, map[string]string{"erro": err.Error()})
+		return
+	}
+	resposta.Padrao(w, http.StatusOK, nil)
+}

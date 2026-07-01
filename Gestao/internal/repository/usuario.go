@@ -38,3 +38,22 @@ func (r *UsuarioRepository) BuscarUsuarioPorID(ctx context.Context, usuarioID in
 	}
 	return &usuario, nil
 }
+
+func (r *UsuarioRepository) BuscarSenhaUsuario(ctx context.Context, usuarioID int64) (*string, error) {
+
+	query := `select senha from tb_usuarios_gestao where id = $1`
+
+	var senha string
+	err := r.db.QueryRowContext(ctx, query, usuarioID).Scan(&senha)
+	if err != nil {
+		return nil, err
+	}
+
+	return &senha, nil
+}
+
+func (r *UsuarioRepository) AtualizarSenhaUsuario(ctx context.Context, tx *sql.Tx, usuarioID int64, novaSenha string) error {
+	query := `UPDATE tb_usuarios_gestao SET senha = $1 WHERE id = $2`
+	_, err := tx.ExecContext(ctx, query, novaSenha, usuarioID)
+	return err
+}

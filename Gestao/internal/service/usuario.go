@@ -3,8 +3,11 @@ package service
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"gestao/internal/model"
 	"gestao/internal/repository"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UsuarioService struct {
@@ -43,4 +46,32 @@ func (s *UsuarioService) CriarUsuario(ctx context.Context, usuario *model.Usuari
 func (s *UsuarioService) BuscarUsuarioPorID(ctx context.Context, usuarioID int) (*model.Usuario, error) {
 
 	return s.repository.Usuarios.BuscarUsuarioPorID(ctx, usuarioID)
+}
+
+func (s *UsuarioService) AlterarSenha(ctx context.Context, usuarioID int64, senhaAtual, senhaNova, senhaNovaConfirmacao string) error {
+
+	senhaArmazenada, err := s.repository.Usuarios.BuscarSenhaUsuario(ctx, usuarioID)
+	if err != nil {
+		return err
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(*senhaArmazenada), []byte(senhaAtual)); err != nil {
+		return err
+	}
+
+	if senhaNova != senhaNovaConfirmacao {
+		return errors.New("a nova senha e a confirmação não coincidem")
+	}
+
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := s.repository.Usuarios.AtualizarSenhaUsuario(ctx, tx, usuarioID, senhaNova); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
