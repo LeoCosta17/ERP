@@ -1,41 +1,39 @@
 import { getToken } from "../utils/auth.js";
 import { showError } from '/static/js/utils/showError.js'; 
+import { validaRespostaRequisicao } from '/static/js/utils/resposta.js';
+
+async function buscarClientesAPI(busca){
+
+  const token = getToken();
+
+  let url = '/api/clientes';
+  if(busca){
+    url += `?busca=${encodeURIComponent(busca)}`;
+  }
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  });
+
+  return await validaRespostaRequisicao(res);
+}
 
 export async function carregarClientes(busca = "") {
   const tbody = document.getElementById("tabela_clientes_body");
   if (!tbody) return;
 
-  const token = getToken();
   tbody.innerHTML = `<tr><td colspan="7" class="text-muted py-5 text-center">Carregando...</td></tr>`;
 
   try {
-    let url = "/api/clientes";
-    if (busca) {
-      url += `?busca=${encodeURIComponent(busca)}`;
-    }
 
-    const res = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (res.status === 401) {
-      window.location.href = "/";
-      return;
-    }
-
-    if (!res.ok) {
-      showError("Erro ao carregar lista de clientes.");
-      tbody.innerHTML = `<tr><td colspan="7" class="text-danger py-5 text-center">Erro ao carregar.</td></tr>`;
-      return;
-    }
-
-    const dados = await res.json();
+    const dados = await buscarClientesAPI(busca);
     renderTabela(dados);
+
   } catch (err) {
-    showErrror(err.message || "Erro de comunicação.");
-    tbody.innerHTML = `<tr><td colspan="7" class="text-danger py-5 text-center">Erro de comunicação.</td></tr>`;
+    showError(err.message || "Erro ao carregar clientes. Tente novamente mais tarde.");
   }
 }
 
