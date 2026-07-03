@@ -47,18 +47,19 @@ func (r *ClienteRepository) CriarCliente(ctx context.Context, tx *sql.Tx, c *mod
 			values ($1, $2, $3, $4, $5, $6, $7, $8)
 			returning id, created_at;
 		`
-	err = tx.QueryRowContext(
-		ctx, query, c.ID, c.Endereco.CEP, c.Endereco.Logradouro,
-		c.Endereco.Numero, c.Endereco.Bairro, c.Endereco.Municipio, c.Endereco.UF,
-		c.Endereco.CodigoMunicipio).Scan(
-		&endID, &c.Endereco.CreatedAt,
-	)
-	if err != nil {
-		return nil, err
+	if len(c.Enderecos) > 0 {
+		for index, _ := range c.Enderecos {
+			err = tx.QueryRowContext(
+				ctx, query, c.ID, c.Enderecos[index].CEP, c.Enderecos[index].Logradouro,
+				c.Enderecos[index].Numero, c.Enderecos[index].Bairro, c.Enderecos[index].Municipio, c.Enderecos[index].UF,
+				c.Enderecos[index].CodigoMunicipio).Scan(
+				&endID, &c.Enderecos[index].CreatedAt,
+			)
+			if err != nil {
+				return nil, err
+			}
+		}
 	}
-
-	c.Endereco.ID = endID
-	c.Endereco.IDCliente = c.ID
 
 	return c, nil
 }
@@ -147,11 +148,25 @@ func (r *ClienteRepository) ObterClientePorID(ctx context.Context, tx *sql.Tx, i
 		FROM tb_enderecos_clientes
 		WHERE id_cliente = $1
 	`
-	err = tx.QueryRowContext(ctx, queryEndereco, id).Scan(
-		&c.Endereco.ID, &c.Endereco.IDCliente, &c.Endereco.CEP, &c.Endereco.Logradouro, &c.Endereco.Numero, &c.Endereco.Bairro,
-		&c.Endereco.Municipio, &c.Endereco.UF, &c.Endereco.CodigoMunicipio, &c.CreatedAt,
-	)
+	rows, err := tx.QueryContext(ctx, queryEndereco, id)
 	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	c.Enderecos = make([]model.EnderecoCliente, 0)
+	for rows.Next() {
+		var endereco model.EnderecoCliente
+		err := rows.Scan(
+			&endereco.ID, &endereco.IDCliente, &endereco.CEP, &endereco.Logradouro, &endereco.Numero, &endereco.Bairro,
+			&endereco.Municipio, &endereco.UF, &endereco.CodigoMunicipio, &endereco.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		c.Enderecos = append(c.Enderecos, endereco)
+	}
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
@@ -167,20 +182,6 @@ func (r *ClienteRepository) AtualizarCliente(ctx context.Context, tx *sql.Tx, ID
 	`
 	_, err := tx.ExecContext(ctx, query, c.Nome, c.Tipo, nullIfEmpty(c.Email), nullIfEmpty(c.Telefone),
 		nullIfEmpty(c.CPF), nullIfEmpty(c.CNPJ), nullIfZeroInt(c.Contribuinte), c.IsConsumidorFinal, nullIfEmpty(c.IE), ID_Cliente)
-	if err != nil {
-		return err
-	}
-
-	// query para atualizar o endereço do cliente
-	query = `
-		UPDATE tb_enderecos_clientes
-		SET cep = $1, logradouro = $2, numero = $3, bairro = $4, municipio = $5, uf = $6, codigo_municipio = $7, updated_at = CURRENT_TIMESTAMP
-		WHERE id_cliente = $8
-	`
-	_, err = tx.ExecContext(ctx, query,
-		c.Endereco.CEP, c.Endereco.Logradouro, c.Endereco.Numero, c.Endereco.Bairro,
-		c.Endereco.Municipio, c.Endereco.UF, c.Endereco.CodigoMunicipio, ID_Cliente,
-	)
 	if err != nil {
 		return err
 	}
